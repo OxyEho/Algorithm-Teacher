@@ -1,18 +1,19 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
-public class Graph<T> {
-    private HashMap<T, ArrayList<T>> baseMap;
-    public Graph(HashMap<T, ArrayList<T>> baseMap){
-        this.baseMap = baseMap;
+public class Graph<T>{
+    private ArrayList<Node<T>> baseList;
+    public Graph(ArrayList<Node<T>> baseMap){
+        this.baseList = baseMap;
     }
 
     public ArrayList<T> getAdjacencyList(T value){
-        return baseMap.get(value);
+        for (Node<T> node : baseList){
+            if (node.equals(value))
+                return node.getAdjacency();
+        }
+
+        return null;
     }
 
-    public Set<T> getNodeList(){
-        return baseMap.keySet();
-    }
+    public ArrayList<Node<T>> getNodeList(){ return baseList; }
 }
