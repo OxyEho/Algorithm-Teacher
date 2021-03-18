@@ -1,9 +1,11 @@
+package Models;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class Node<T> {
-    private T value;
-    private ArrayList<T> adjacency;
+    private final T value;
+    private final ArrayList<T> adjacency;
 
     public Node(T value, ArrayList<T> adjacencyList) {
         this.value = value;

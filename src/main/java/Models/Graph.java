@@ -1,21 +1,14 @@
+package Models;
+
 import java.util.*;
 
 public class Graph<T>{
-    private HashMap<T, Node<T>> baseMap;
+    private final HashMap<T, Node<T>> baseMap;
     public Graph(HashMap<T, Node<T>> baseMap){
         this.baseMap = baseMap;
     }
     public Graph(){ baseMap = new HashMap<>(); }
 
-//    непонятно насколько нужен этот метод, у Node есть такой же
-//    public ArrayList<T> getAdjacencyList(T value){
-//        for (Node<T> node : baseMap.values()){
-//            if (node.equals(value))
-//                return node.getAdjacency();
-//        }
-//
-//        return null;
-//    }
 
     public void addNode(Node<T> node, Collection<T> neighbours){
         if (!baseMap.containsKey(node.getValue())) {
