@@ -17,6 +17,13 @@ public class Graph<T>{
 //        return null;
 //    }
 
+    public void addNode(Node<T> node, Collection<T> neighbours){
+        if (!baseMap.containsKey(node.getValue())) {
+            baseMap.put(node.getValue(), new Node<>(node.getValue(), new ArrayList<>(neighbours)));
+        }
+        else baseMap.get(node.getValue()).addAdjacency(neighbours);
+    }
+
     public void addNode(Node<T> node){
         if (!baseMap.containsKey(node.getValue())) {
             baseMap.put(node.getValue(), new Node<>(node.getValue(), new ArrayList<>()));

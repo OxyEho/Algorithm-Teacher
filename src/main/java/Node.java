@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Collection;
 
 public class Node<T> {
     private T value;
@@ -12,7 +12,9 @@ public class Node<T> {
 
     public ArrayList<T> getAdjacency(){ return adjacency; }
 
-    public void addAdjacency(T neighbour){ adjacency.add(neighbour); }
+    public void addAdjacency(Collection<T> neighbours) {
+        adjacency.addAll(neighbours);
+    }
 
     public T getValue() { return value; }
 
