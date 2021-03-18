@@ -3,20 +3,16 @@ import java.util.Objects;
 
 public class Node<T> {
     private T value;
-    private T father;
     private ArrayList<T> adjacency;
 
     public Node(T value, ArrayList<T> adjacencyList) {
         this.value = value;
         adjacency = adjacencyList;
-        father = null;
     }
 
-    public void setFather(T father) { this.father = father; }
-
-    public T getFather() { return father; }
-
     public ArrayList<T> getAdjacency(){ return adjacency; }
+
+    public void addAdjacency(T neighbour){ adjacency.add(neighbour); }
 
     public T getValue() { return value; }
 
@@ -32,7 +28,5 @@ public class Node<T> {
     }
 
     @Override
-    public int hashCode() {
-        return value.hashCode();
-    }
+    public int hashCode() { return value.hashCode(); }
 }

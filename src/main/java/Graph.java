@@ -1,19 +1,33 @@
 import java.util.*;
 
 public class Graph<T>{
-    private ArrayList<Node<T>> baseList;
-    public Graph(ArrayList<Node<T>> baseMap){
-        this.baseList = baseMap;
+    private HashMap<T, Node<T>> baseMap;
+    public Graph(HashMap<T, Node<T>> baseMap){
+        this.baseMap = baseMap;
     }
+    public Graph(){ baseMap = new HashMap<>(); }
 
-    public ArrayList<T> getAdjacencyList(T value){
-        for (Node<T> node : baseList){
-            if (node.equals(value))
-                return node.getAdjacency();
+//    непонятно насколько нужен этот метод, у Node есть такой же
+//    public ArrayList<T> getAdjacencyList(T value){
+//        for (Node<T> node : baseMap.values()){
+//            if (node.equals(value))
+//                return node.getAdjacency();
+//        }
+//
+//        return null;
+//    }
+
+    public void addNode(Node<T> node){
+        if (!baseMap.containsKey(node.getValue())) {
+            baseMap.put(node.getValue(), new Node<>(node.getValue(), new ArrayList<>()));
         }
-
-        return null;
     }
 
-    public ArrayList<Node<T>> getNodeList(){ return baseList; }
+    public Node<T> getNode(T value){ return baseMap.get(value); }
+
+    public HashMap<T, Node<T>> getBaseMap() {
+        return baseMap;
+    }
+
+    public ArrayList<Node<T>> getNodeList(){ return (ArrayList<Node<T>>) baseMap.values(); }
 }
