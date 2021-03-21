@@ -29,5 +29,5 @@ public class Graph<T>{
         return baseMap;
     }
 
-    public ArrayList<Node<T>> getNodeList(){ return (ArrayList<Node<T>>) baseMap.values(); }
+    public Collection<Node<T>> getNodeList(){ return baseMap.values(); }
 }

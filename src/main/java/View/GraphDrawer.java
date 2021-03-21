@@ -1,31 +1,25 @@
 package View;
 
-import Models.Graph;
-
 import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.util.ArrayList;
 
 public class GraphDrawer extends JFrame {
-    JFrame frame;
-
+    private JPanel drawPanel = new JPanel();
     public GraphDrawer() {
-        super("TestTest");
-        setSize(400,500);
         setLayout(null);
-        setBounds(200, 200, 1000, 1000);
+        setBounds(600, 200, 800, 800);
         setVisible(true);
-        // dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-                dispose();
-            }
-        });
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
     }
 
-//    private void dragGraph(Graph<Integer> graph){
-//        graph.getNodeList().size();
-//    }
+    public void drawGraph(Integer[] nodes, ArrayList<Integer[]> edges){
+
+            Circle circle = new Circle(nodes[0].toString());
+            circle.setBounds(100, 100,100, 100);
+            add(circle);
+        //рисует
+    }
+
 }
