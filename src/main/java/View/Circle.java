@@ -13,6 +13,7 @@ public class Circle extends JComponent {
         this.size = size;
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         g.setColor(Color.BLACK);
         g.fillOval(0, 0, this.size.getLeft() - 10, this.size.getRight() - 10);

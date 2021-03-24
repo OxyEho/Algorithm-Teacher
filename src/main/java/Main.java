@@ -35,8 +35,8 @@ public class Main {
         });
 //        var res1 = AlgorithmRunner.dfs(graph.getBaseMap().get(1), graph);
 //        Graph<Integer> res2 = AlgorithmRunner.bfs(graph.getBaseMap().get(1), graph);
-        GraphDrawer drawer = new GraphDrawer();
-        DrawerController controller = new DrawerController(graph, drawer);
-        controller.transGraph();
+        DrawerController controller = new DrawerController(graph);
+        GraphDrawer drawer = new GraphDrawer(controller);
+        drawer.setVisible(true);
     }
 }
