@@ -6,13 +6,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class GraphDrawer extends JFrame {
     private static final int divider = 10;
     private final DrawerController controller;
-    private final HashMap<Integer, Pair<Integer, Integer>> coordinates = new HashMap<>();
+    private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
     private class GraphPanel extends JPanel{
         public GraphPanel(){
             setDoubleBuffered(true);
@@ -22,27 +24,30 @@ public class GraphDrawer extends JFrame {
             g.setColor(Color.BLACK);
             g.fillOval(centerX, centerY, width, height);
             g.setColor(Color.WHITE);
-            g.fillOval(centerX + 10,centerY+ 10, width - 20, height - 20);
+            g.fillOval(centerX + 10,centerY + 10, width - 20, height - 20);
             g.setColor(Color.BLACK);
-            g.setFont(new Font("TimesRoman", Font.PLAIN, height/4));
-            g.drawString(text, centerX + width/2, centerY + height/2);
+            Font font = new Font("TimesRoman", Font.PLAIN, height/3);
+            g.setFont(font);
+            Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
+            g.drawString(text, centerX + width / 2 - (int)r.getWidth() / 2,
+                    centerY + height / 2 + (int)r.getHeight() / 4);
         }
 
-        private void drawNodes(Graphics g, Integer[] nodes) {
+        private void drawNodes(Graphics g, List<String> nodes) {
             int radius = Math.min(getHeight()/4, getWidth()/4);
             int x;
             int y;
-            double phi = 2 * Math.PI / nodes.length;
-            for (int i = 0; i < nodes.length; i++){
+            double phi = 2 * Math.PI / nodes.size();
+            for (int i = 0; i < nodes.size(); i++){
                 x = (int)(radius * Math.cos(phi * i)) + getWidth()/2;
                 y = (int)(radius * Math.sin(phi * i)) + getHeight()/2;
-                drawNode(g, x, y, getWidth()/divider, getHeight()/divider, nodes[i].toString());
-                coordinates.put(nodes[i], Pair.of(x, y));
+                drawNode(g, x, y, getWidth()/divider, getHeight()/divider, nodes.get(i));
+                coordinates.put(nodes.get(i), Pair.of(x, y));
             }
         }
 
-        private void drawEdges(Graphics g, ArrayList<Pair<Integer, Integer>> edges, int width, int height) {
-            for (Pair<Integer, Integer> edge : edges){
+        private void drawEdges(Graphics g, List<Pair<String, String>> edges, int width, int height) {
+            for (Pair<String, String> edge : edges){
                 Pair<Integer, Integer> from = coordinates.get(edge.getLeft());
                 Pair<Integer, Integer> to = coordinates.get(edge.getRight());
                 Graphics2D g2 = (Graphics2D)g;

@@ -1,10 +1,11 @@
 package Controller;
 
 import Models.Graph;
-import View.GraphDrawer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class DrawerController {
@@ -13,11 +14,15 @@ public class DrawerController {
         this.graph = graph;
     }
 
-    public Integer[] getNodes(){
-        return graph.getBaseMap().keySet().toArray(new Integer[0]);
+    public List<String> getNodes(){
+        return graph.getBaseMap().keySet().stream().map(Object::toString).collect(Collectors.toList());
     }
 
-    public ArrayList<Pair<Integer, Integer>> getEdges(){
-        return graph.getEdges();
+    public List<Pair<String, String>> getEdges(){
+        return graph
+                .getEdges()
+                .stream()
+                .map(pair -> Pair.of(pair.getLeft().toString(), pair.getRight().toString()))
+                .collect(Collectors.toList());
     }
 }
