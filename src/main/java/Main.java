@@ -12,13 +12,13 @@ import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) {
-        var graph = new Graph<Integer>(new HashMap<>(){
+        var graph = new Graph<String>(new HashMap<>(){
             {
-                put(1, (new Node<>(1, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)))));
-                put(2, (new Node<>(2, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)))));
-                put(3, (new Node<>(3, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)))));
-                put(4, (new Node<>(4, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)))));
-                put(5, (new Node<>(5, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)))));
+                put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "c", "d", "e")))));
+                put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a", "c", "d", "e")))));
+                put("c", (new Node<>("c", new ArrayList<>(Arrays.asList("b", "a", "d", "e")))));
+                put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("b", "c", "a", "e")))));
+                put("e", (new Node<>("e", new ArrayList<>(Arrays.asList("b", "c", "d", "a")))));
 //                put(1, (new Node<>(1, new ArrayList<>(Arrays.asList(2, 3, 4)))));
 //                put(2, (new Node<>(2, new ArrayList<>(Arrays.asList(3, 4, 5)))));
 //                put(3, (new Node<>(3, new ArrayList<>(Arrays.asList(1, 2)))));

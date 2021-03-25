@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 
 public class DrawerController {
-    private final Graph<Integer> graph;
-    public DrawerController(Graph<Integer> graph){
+    private final Graph<?> graph;
+    public DrawerController(Graph<?> graph){
         this.graph = graph;
     }
 
