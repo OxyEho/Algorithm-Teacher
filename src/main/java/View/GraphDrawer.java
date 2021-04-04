@@ -7,7 +7,6 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,8 +14,9 @@ public class GraphDrawer extends JFrame {
     private static final int divider = 10;
     private final DrawerController controller;
     private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
-    private class GraphPanel extends JPanel{
-        public GraphPanel(){
+
+    private class GraphPanel extends JPanel {
+        private GraphPanel(){
             setDoubleBuffered(true);
         }
 
@@ -65,6 +65,7 @@ public class GraphDrawer extends JFrame {
             drawNodes(g, controller.getNodes());
         }
     }
+
     public GraphDrawer(DrawerController controller) {
         this.controller = controller;
         setLayout(null);

@@ -1,17 +1,13 @@
-import Controller.DrawerController;
-import Models.AlgorithmRunner;
 import Models.Graph;
 import Models.Node;
-import View.GraphDrawer;
+import View.MainWindow;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         var graph = new Graph<String>(new HashMap<>(){
             {
                 put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "c", "d", "e")))));
@@ -35,8 +31,11 @@ public class Main {
         });
 //        var res1 = AlgorithmRunner.dfs(graph.getBaseMap().get(1), graph);
 //        Graph<Integer> res2 = AlgorithmRunner.bfs(graph.getBaseMap().get(1), graph);
-        DrawerController controller = new DrawerController(graph);
-        GraphDrawer drawer = new GraphDrawer(controller);
-        drawer.setVisible(true);
+
+//        DrawerController controller = new DrawerController(graph);
+//        GraphDrawer drawer = new GraphDrawer(controller);
+//        drawer.setVisible(true);
+
+        //new MainWindow();
     }
 }
