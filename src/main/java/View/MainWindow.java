@@ -15,6 +15,7 @@ public class MainWindow extends JFrame {
         setBounds(0, 0, 800, 800);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        repaint();
         initButtons();
     }
 
@@ -29,5 +30,6 @@ public class MainWindow extends JFrame {
         anotherButton.addActionListener(buttonActionListener);
         anotherButton.setFont(new Font("TimesRoman", Font.PLAIN, 40));
         container.add(anotherButton);
+        repaint();
     }
 }

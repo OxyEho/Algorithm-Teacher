@@ -1,11 +1,13 @@
 package View;
 
 import Controller.DrawerController;
+import Controller.MainController;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +15,13 @@ import java.util.List;
 public class GraphDrawer extends JFrame {
     private static final int divider = 10;
     private final DrawerController controller;
+    private final ActionListener onExitButtonClick;
     private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
 
     private class GraphPanel extends JPanel {
         private GraphPanel(){
             setDoubleBuffered(true);
+            setSize(400, 400);
         }
 
         public void drawNode(Graphics g, int centerX, int centerY, int width, int height, String text){
@@ -66,19 +70,43 @@ public class GraphDrawer extends JFrame {
         }
     }
 
-    public GraphDrawer(DrawerController controller) {
-        this.controller = controller;
+    private class ButtonsPanel extends JPanel {
+        private ButtonsPanel(){
+            setLayout(new FlowLayout(FlowLayout.LEADING));
+            setVisible(true);
+            createAlgorithmsPart();
+            createServicePart();
+            setBackground(Color.getHSBColor(83.5F, 67, 88));
+            setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        }
+
+        private void createAlgorithmsPart() {
+            add(new JLabel("Выбор алгоритма для запуска: "));
+            JComboBox<String> algorithms = new JComboBox<>(new String[]{"BFS", "DFS", "dfsadasd dsad"});
+            add(algorithms);
+            add(new JButton("Запустить алгоритм"));
+        }
+
+        private void createServicePart() {
+            JButton toMenu = new JButton("В главное меню");
+            toMenu.addActionListener(onExitButtonClick);
+            add(toMenu, BorderLayout.EAST); // Почему-то не получается добавить кнопку к правому краю контейнера
+        }
+    }
+
+    public GraphDrawer(ActionListener onExit, DrawerController drawerController) {
+        controller = drawerController;
+        onExitButtonClick = onExit;
         setLayout(null);
         setSize(800, 800);
-        setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout());
-        add(contentPanel, BorderLayout.CENTER);
 
-        JPanel graphPanel = new GraphPanel();
+        setVisible(true);
+
+        var graphPanel = new GraphPanel();
         graphPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        contentPanel.add(graphPanel, BorderLayout.CENTER);
+        add(graphPanel, BorderLayout.CENTER);
+        add(new ButtonsPanel(), BorderLayout.NORTH);
     }
 }

@@ -13,10 +13,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class MainController {
-    static {}
+    static { }
     private static MainWindow mainWindow;
     private static GraphDrawer graphDrawer;
-    private static Graph<String> defaultGraph = new Graph<>(new HashMap<>(){
+    private static final Graph<String> defaultGraph = new Graph<>(new HashMap<>(){
         {
             put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "c", "d", "e")))));
             put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a", "c", "d", "e")))));
@@ -24,22 +24,32 @@ public class MainController {
             put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("b", "c", "a", "e")))));
             put("e", (new Node<>("e", new ArrayList<>(Arrays.asList("b", "c", "d", "a")))));
         }
-    });
+    }); // K5
 
     public static void main(String[] args) {
         mainWindow = new MainWindow(new MenuButtonListener());
-
+        mainWindow.repaint();
     }
 
-    public static class MenuButtonListener implements ActionListener {
+    private static class MenuButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JButton origin = (JButton) e.getSource();
             if (origin.getText().equals("View")){
                 mainWindow.dispose();
-                graphDrawer= new GraphDrawer(new DrawerController(defaultGraph));
+                graphDrawer = new GraphDrawer(new ToMenuButtonListener(), new DrawerController(defaultGraph));
             }
 
+        }
+    }
+
+    private static class ToMenuButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            mainWindow.setVisible(true);
+            System.out.println(e.getActionCommand());
+            System.out.println(e.getSource() == graphDrawer);
+            graphDrawer.dispose();
         }
     }
 }
