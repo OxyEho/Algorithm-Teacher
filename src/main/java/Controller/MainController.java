@@ -13,9 +13,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class MainController {
-    static { }
     private static MainWindow mainWindow;
-    private static GraphDrawer graphDrawer;
+    private static DrawerController drawerController;
     private static final Graph<String> defaultGraph = new Graph<>(new HashMap<>(){
         {
             put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "c", "d", "e")))));
@@ -37,7 +36,7 @@ public class MainController {
             JButton origin = (JButton) e.getSource();
             if (origin.getText().equals("View")){
                 mainWindow.dispose();
-                graphDrawer = new GraphDrawer(new ToMenuButtonListener(), new DrawerController(defaultGraph));
+                drawerController = new DrawerController(new ToMenuButtonListener(), defaultGraph);
             }
 
         }
@@ -48,8 +47,8 @@ public class MainController {
         public void actionPerformed(ActionEvent e) {
             mainWindow.setVisible(true);
             System.out.println(e.getActionCommand());
-            System.out.println(e.getSource() == graphDrawer);
-            graphDrawer.dispose();
+            System.out.println(e.getSource() == drawerController.getGraphDrawer());
+            drawerController.getGraphDrawer().dispose();
         }
     }
 }

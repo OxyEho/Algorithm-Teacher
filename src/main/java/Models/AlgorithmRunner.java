@@ -37,9 +37,11 @@ public class AlgorithmRunner {
     }
 
     public static <T> Graph<T> bfs(Node<T> startVertex, Graph<T> graph) {
+        int sequenceNumber = 0;
         var resultGraph = new Graph<T>();
         ArrayDeque<Node<T>> queue = new ArrayDeque<>();
         queue.add(startVertex);
+        startVertex.setSequenceNumber(sequenceNumber);
         var seenVertices = new HashSet<T>();
         seenVertices.add(startVertex.getValue());
         while (!queue.isEmpty()){
@@ -47,8 +49,10 @@ public class AlgorithmRunner {
             resultGraph.addNode(currentVertex);
             for (T vertex : currentVertex.getAdjacency()) {
                 if (!seenVertices.contains(vertex)) {
+                    sequenceNumber++;
                     seenVertices.add(vertex);
                     queue.add(graph.getBaseMap().get(vertex));
+                    graph.getBaseMap().get(vertex).setSequenceNumber(sequenceNumber);
                     resultGraph.addNode(currentVertex, Collections.singletonList(vertex));
                 }
             }

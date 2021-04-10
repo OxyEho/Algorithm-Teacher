@@ -2,6 +2,7 @@ package View;
 
 import Controller.DrawerController;
 import Controller.MainController;
+import Models.Graph;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
@@ -13,9 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GraphDrawer extends JFrame {
+    private final List<String> nodes;
+    private final List<Pair<String, String>> edges;
     private static final int divider = 10;
-    private final DrawerController controller;
     private final ActionListener onExitButtonClick;
+    private final ActionListener onStartButtonClick;
     private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
 
     private class GraphPanel extends JPanel {
@@ -64,9 +67,9 @@ public class GraphDrawer extends JFrame {
 
         @Override
         public void paint(Graphics g){
-            drawNodes(g, controller.getNodes());
-            drawEdges(g, controller.getEdges(), getWidth()/divider, getHeight()/divider);
-            drawNodes(g, controller.getNodes());
+            drawNodes(g, nodes);
+            drawEdges(g, edges, getWidth()/divider, getHeight()/divider);
+            drawNodes(g, nodes);
         }
     }
 
@@ -84,7 +87,9 @@ public class GraphDrawer extends JFrame {
             add(new JLabel("Выбор алгоритма для запуска: "));
             JComboBox<String> algorithms = new JComboBox<>(new String[]{"BFS", "DFS", "dfsadasd dsad"});
             add(algorithms);
-            add(new JButton("Запустить алгоритм"));
+            JButton startButton = new JButton("Запустить алгоритм");
+            startButton.addActionListener(onStartButtonClick);
+            add(startButton);
         }
 
         private void createServicePart() {
@@ -94,9 +99,12 @@ public class GraphDrawer extends JFrame {
         }
     }
 
-    public GraphDrawer(ActionListener onExit, DrawerController drawerController) {
-        controller = drawerController;
+    public GraphDrawer(ActionListener onExit, ActionListener onStart,
+                       List<String> nodes, List<Pair<String, String>> pairs) {
+        this.nodes = nodes;
+        this.edges = pairs;
         onExitButtonClick = onExit;
+        onStartButtonClick =onStart;
         setLayout(null);
         setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
