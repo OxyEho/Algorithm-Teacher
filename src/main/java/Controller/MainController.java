@@ -2,7 +2,6 @@ package Controller;
 
 import Models.Graph;
 import Models.Node;
-import View.GraphDrawer;
 import View.MainWindow;
 
 import javax.swing.*;
@@ -39,7 +38,6 @@ public class MainController {
             if (origin.getText().equals("View")){
                 mainWindow.dispose();
                 drawerController = new DrawerController(toMenuButtonListener, defaultGraph);
-                // graphDrawer = new GraphDrawer(new ToMenuButtonListener(), );
             }
 
         }

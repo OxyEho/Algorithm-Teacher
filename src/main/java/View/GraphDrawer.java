@@ -7,30 +7,32 @@ import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GraphDrawer extends JFrame {
     private static final int DIVIDER = 10;
 
     private final List<String> nodes;
     private final List<Pair<String, String>> edges;
-    private List<String> paintingSequence;
+    //private List<String> paintingSequence;
     private final ActionListener onExitButtonClick;
     private final ActionListener onStartButtonClick;
     private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
 
+    private final HashMap<String, Color> colors = new HashMap<>();
+
     private class GraphPanel extends JPanel {
         private GraphPanel(){
             setDoubleBuffered(true);
-            setSize(400, 400);
+            //setSize(800, 100);
         }
 
         public void drawNode(Graphics g, int centerX, int centerY, int width, int height, String text){
             g.setColor(Color.BLACK);
             g.fillOval(centerX, centerY, width, height);
-            g.setColor(Color.WHITE);
+            g.setColor(colors.get(text));
             g.fillOval(centerX + 10,centerY + 10, width - 20, height - 20);
             g.setColor(Color.BLACK);
             Font font = new Font("TimesRoman", Font.PLAIN, height/3);
@@ -68,7 +70,7 @@ public class GraphDrawer extends JFrame {
         @Override
         public void paintComponent(Graphics g){
             drawNodes(g, nodes);
-            drawEdges(g, edges, getWidth()/ DIVIDER, getHeight()/ DIVIDER);
+            drawEdges(g, edges, getWidth()/DIVIDER, getHeight()/DIVIDER);
             drawNodes(g, nodes);
         }
     }
@@ -105,7 +107,13 @@ public class GraphDrawer extends JFrame {
         this.edges = pairs;
         onExitButtonClick = onExit;
         onStartButtonClick = onStart;
-        paintingSequence = Collections.emptyList();
+        //paintingSequence = Collections.emptyList();
+
+        //Тут начало костылей
+        for (String node : this.nodes){
+            colors.put(node, Color.WHITE);
+        }
+
         setLayout(null);
         setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -119,5 +127,23 @@ public class GraphDrawer extends JFrame {
         add(new ButtonsPanel(), BorderLayout.NORTH);
     }
 
-    public void setPaintingSequence(List<String> sequence) { paintingSequence = sequence; }
+    //public void setPaintingSequence(List<String> sequence) { paintingSequence = sequence; }
+
+    public void illuminateNodes(List<String> paintingSequence) {
+        System.out.println("Invoked!");
+        System.out.println(String.join(" ", paintingSequence));
+        AtomicInteger lastIndex = new AtomicInteger();
+        final Timer timer = new Timer(1500, null);
+        timer.addActionListener(tick -> {
+            if (lastIndex.get() < paintingSequence.size()){
+                colors.put(paintingSequence.get(lastIndex.get()), Color.CYAN);
+                lastIndex.getAndIncrement();
+                repaint();
+            } else {
+                timer.stop();
+                System.out.println("Stopped!");
+            }
+        });
+        timer.start();
+    }
 }
