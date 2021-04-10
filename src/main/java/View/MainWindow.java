@@ -1,7 +1,5 @@
 package View;
 
-import Controller.MainController;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -13,15 +11,14 @@ public class MainWindow extends JFrame {
         MainWindow.buttonActionListener = buttonActionListener;
         setLayout(null);
         setBounds(0, 0, 800, 800);
-        setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        repaint();
         initButtons();
+        setVisible(true);
     }
 
     private void initButtons() {
         Container container = getContentPane();
-        container.setLayout(new GridLayout());
+        container.setLayout(new GridLayout(2, 2));
         JButton drawerButton = new JButton("View");
         drawerButton.addActionListener(buttonActionListener);
         drawerButton.setFont(new Font("TimesRoman", Font.PLAIN, 40));
@@ -30,6 +27,5 @@ public class MainWindow extends JFrame {
         anotherButton.addActionListener(buttonActionListener);
         anotherButton.setFont(new Font("TimesRoman", Font.PLAIN, 40));
         container.add(anotherButton);
-        repaint();
     }
 }

@@ -32,6 +32,7 @@ public class DrawerController {
             JButton origin = (JButton) e.getSource();
             if (origin.getText().equals("Запустить алгоритм")){
                 AlgorithmRunner.bfs(graph.getNode("a"), graph);
+                graphDrawer.setPaintingSequence(getNameSequence());
             }
         }
     }

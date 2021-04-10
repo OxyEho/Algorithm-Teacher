@@ -1,8 +1,5 @@
 package View;
 
-import Controller.DrawerController;
-import Controller.MainController;
-import Models.Graph;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
@@ -10,13 +7,16 @@ import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 public class GraphDrawer extends JFrame {
+    private static final int DIVIDER = 10;
+
     private final List<String> nodes;
     private final List<Pair<String, String>> edges;
-    private static final int divider = 10;
+    private List<String> paintingSequence;
     private final ActionListener onExitButtonClick;
     private final ActionListener onStartButtonClick;
     private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
@@ -48,7 +48,7 @@ public class GraphDrawer extends JFrame {
             for (int i = 0; i < nodes.size(); i++){
                 x = (int)(radius * Math.cos(phi * i)) + getWidth()/2;
                 y = (int)(radius * Math.sin(phi * i)) + getHeight()/2;
-                drawNode(g, x, y, getWidth()/divider, getHeight()/divider, nodes.get(i));
+                drawNode(g, x, y, getWidth()/ DIVIDER, getHeight()/ DIVIDER, nodes.get(i));
                 coordinates.put(nodes.get(i), Pair.of(x, y));
             }
         }
@@ -66,9 +66,9 @@ public class GraphDrawer extends JFrame {
         }
 
         @Override
-        public void paint(Graphics g){
+        public void paintComponent(Graphics g){
             drawNodes(g, nodes);
-            drawEdges(g, edges, getWidth()/divider, getHeight()/divider);
+            drawEdges(g, edges, getWidth()/ DIVIDER, getHeight()/ DIVIDER);
             drawNodes(g, nodes);
         }
     }
@@ -84,7 +84,7 @@ public class GraphDrawer extends JFrame {
         }
 
         private void createAlgorithmsPart() {
-            add(new JLabel("Выбор алгоритма для запуска: "));
+            add(new JLabel("Выбор алгоритма для запуска:"));
             JComboBox<String> algorithms = new JComboBox<>(new String[]{"BFS", "DFS", "dfsadasd dsad"});
             add(algorithms);
             JButton startButton = new JButton("Запустить алгоритм");
@@ -104,7 +104,8 @@ public class GraphDrawer extends JFrame {
         this.nodes = nodes;
         this.edges = pairs;
         onExitButtonClick = onExit;
-        onStartButtonClick =onStart;
+        onStartButtonClick = onStart;
+        paintingSequence = Collections.emptyList();
         setLayout(null);
         setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -112,9 +113,11 @@ public class GraphDrawer extends JFrame {
 
         setVisible(true);
 
-        var graphPanel = new GraphPanel();
+        GraphPanel graphPanel = new GraphPanel();
         graphPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         add(graphPanel, BorderLayout.CENTER);
         add(new ButtonsPanel(), BorderLayout.NORTH);
     }
+
+    public void setPaintingSequence(List<String> sequence) { paintingSequence = sequence; }
 }

@@ -15,6 +15,7 @@ import java.util.HashMap;
 public class MainController {
     private static MainWindow mainWindow;
     private static DrawerController drawerController;
+    private static ToMenuButtonListener toMenuButtonListener;
     private static final Graph<String> defaultGraph = new Graph<>(new HashMap<>(){
         {
             put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "c", "d", "e")))));
@@ -26,6 +27,7 @@ public class MainController {
     }); // K5
 
     public static void main(String[] args) {
+        toMenuButtonListener = new ToMenuButtonListener();
         mainWindow = new MainWindow(new MenuButtonListener());
         mainWindow.repaint();
     }
@@ -36,7 +38,8 @@ public class MainController {
             JButton origin = (JButton) e.getSource();
             if (origin.getText().equals("View")){
                 mainWindow.dispose();
-                drawerController = new DrawerController(new ToMenuButtonListener(), defaultGraph);
+                drawerController = new DrawerController(toMenuButtonListener, defaultGraph);
+                // graphDrawer = new GraphDrawer(new ToMenuButtonListener(), );
             }
 
         }
@@ -46,8 +49,6 @@ public class MainController {
         @Override
         public void actionPerformed(ActionEvent e) {
             mainWindow.setVisible(true);
-            System.out.println(e.getActionCommand());
-            System.out.println(e.getSource() == drawerController.getGraphDrawer());
             drawerController.getGraphDrawer().dispose();
         }
     }
