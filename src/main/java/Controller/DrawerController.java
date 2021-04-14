@@ -7,6 +7,7 @@ import View.GraphDrawer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -31,7 +32,12 @@ public class DrawerController {
         public void actionPerformed(ActionEvent e) {
             JButton origin = (JButton) e.getSource();
             if (origin.getText().equals("Запустить алгоритм")){
-                AlgorithmRunner.bfs(graph.getNode("a"), graph);
+                String algorithm = graphDrawer.getAlgorithm();
+                String startNode = graphDrawer.getStartNode();
+                switch (algorithm) {
+                    case "BFS" -> AlgorithmRunner.bfs(graph.getNode(startNode), graph);
+                    case "DFS" -> AlgorithmRunner.dfs(graph.getNode(startNode), graph);
+                }
                 //graphDrawer.setPaintingSequence(getNameSequence());
                 graphDrawer.illuminateNodes(getNameSequence());
             }

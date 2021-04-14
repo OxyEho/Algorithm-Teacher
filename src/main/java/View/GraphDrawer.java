@@ -13,7 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GraphDrawer extends JFrame {
     private static final int DIVIDER = 10;
-
+    private final JComboBox<String> startNode;
+    private final JComboBox<String> algorithms;
     private final List<String> nodes;
     private final List<Pair<String, String>> edges;
     //private List<String> paintingSequence;
@@ -87,11 +88,12 @@ public class GraphDrawer extends JFrame {
 
         private void createAlgorithmsPart() {
             add(new JLabel("Выбор алгоритма для запуска:"));
-            JComboBox<String> algorithms = new JComboBox<>(new String[]{"BFS", "DFS", "dfsadasd dsad"});
             add(algorithms);
             JButton startButton = new JButton("Запустить алгоритм");
             startButton.addActionListener(onStartButtonClick);
             add(startButton);
+            add(new JLabel("Выбор начальной вершины:"));
+            add(startNode);
         }
 
         private void createServicePart() {
@@ -107,18 +109,23 @@ public class GraphDrawer extends JFrame {
         this.edges = pairs;
         onExitButtonClick = onExit;
         onStartButtonClick = onStart;
+        startNode = new JComboBox<>(nodes.toArray(String[]::new));
+        algorithms = new JComboBox<>(new String[]{"BFS", "DFS"});
         //paintingSequence = Collections.emptyList();
 
         //Тут начало костылей
+        //Можно не наследовать Circle от JComponent а просто прокидывать графикс и хранить лист Circle
         for (String node : this.nodes){
             colors.put(node, Color.WHITE);
         }
-
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double width = screenSize.getWidth();
+        double height = screenSize.getHeight();
         setLayout(null);
-        setSize(800, 800);
+        setSize((int) width, (int) height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-
+        setResizable(false);
         setVisible(true);
 
         GraphPanel graphPanel = new GraphPanel();
@@ -127,9 +134,20 @@ public class GraphDrawer extends JFrame {
         add(new ButtonsPanel(), BorderLayout.NORTH);
     }
 
+    public String getStartNode() {
+        return (String) startNode.getSelectedItem();
+    }
+
+    public String getAlgorithm() {
+        return (String) algorithms.getSelectedItem();
+    }
+
     //public void setPaintingSequence(List<String> sequence) { paintingSequence = sequence; }
 
     public void illuminateNodes(List<String> paintingSequence) {
+        for (String node : this.nodes){
+            colors.put(node, Color.WHITE);
+        }
         System.out.println("Invoked!");
         System.out.println(String.join(" ", paintingSequence));
         AtomicInteger lastIndex = new AtomicInteger();

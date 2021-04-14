@@ -18,10 +18,10 @@ public class MainController {
     private static final Graph<String> defaultGraph = new Graph<>(new HashMap<>(){
         {
             put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "c", "d", "e")))));
-            put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a", "c", "d", "e")))));
-            put("c", (new Node<>("c", new ArrayList<>(Arrays.asList("b", "a", "d", "e")))));
-            put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("b", "c", "a", "e")))));
-            put("e", (new Node<>("e", new ArrayList<>(Arrays.asList("b", "c", "d", "a")))));
+            put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a")))));
+            put("c", (new Node<>("c", new ArrayList<>(Arrays.asList("a")))));
+            put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("a")))));
+            put("e", (new Node<>("e", new ArrayList<>(Arrays.asList("a")))));
         }
     }); // K5
 
