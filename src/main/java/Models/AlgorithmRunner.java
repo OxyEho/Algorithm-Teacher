@@ -11,6 +11,7 @@ public class AlgorithmRunner {
     }
 
     public static <T> Graph<T> dfs(Node<T> startVertex, Graph<T> graph) {
+        int sequenceNumber = 0;
         var resultGraph = new Graph<T>();
         Stack<Node<T>> stack = new Stack<>();
         stack.push(startVertex);
@@ -22,8 +23,10 @@ public class AlgorithmRunner {
             var allInSeen = true;
             for (T vertex : currentVertex.getAdjacency()) {
                 if (!seenVertices.contains(vertex)) {
+                    sequenceNumber++;
                     seenVertices.add(vertex);
                     stack.push(graph.getBaseMap().get(vertex));
+                    graph.getBaseMap().get(vertex).setSequenceNumber(sequenceNumber);
                     resultGraph.addNode(currentVertex, Collections.singletonList(vertex));
                     allInSeen = false;
                     break;

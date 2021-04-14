@@ -7,10 +7,8 @@ import View.GraphDrawer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +36,6 @@ public class DrawerController {
                     case "BFS" -> AlgorithmRunner.bfs(graph.getNode(startNode), graph);
                     case "DFS" -> AlgorithmRunner.dfs(graph.getNode(startNode), graph);
                 }
-                //graphDrawer.setPaintingSequence(getNameSequence());
                 graphDrawer.illuminateNodes(getNameSequence());
             }
         }

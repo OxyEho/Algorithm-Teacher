@@ -17,10 +17,10 @@ public class MainController {
     private static ToMenuButtonListener toMenuButtonListener;
     private static final Graph<String> defaultGraph = new Graph<>(new HashMap<>(){
         {
-            put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "c", "d", "e")))));
-            put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a")))));
-            put("c", (new Node<>("c", new ArrayList<>(Arrays.asList("a")))));
-            put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("a")))));
+            put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "e")))));
+            put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a", "c")))));
+            put("c", (new Node<>("c", new ArrayList<>(Arrays.asList("b", "d")))));
+            put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("c")))));
             put("e", (new Node<>("e", new ArrayList<>(Arrays.asList("a")))));
         }
     }); // K5
