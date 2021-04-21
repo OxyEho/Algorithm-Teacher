@@ -4,8 +4,13 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GraphDrawer extends JFrame {
     private static final int DIVIDER = 10;
-    private final JComboBox<String> startNode;
-    private final JComboBox<String> algorithms;
+    private final HashMap<String, JButton> buttons;
+    private final JComboBox<String> startNodeChoice;
+    private final JComboBox<String> algorithmChoice;
     private final List<String> nodes;
     private final List<Pair<String, String>> edges;
-    //private List<String> paintingSequence;
     private final ActionListener onExitButtonClick;
     private final ActionListener onStartButtonClick;
     private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
@@ -26,8 +31,50 @@ public class GraphDrawer extends JFrame {
 
     private class GraphPanel extends JPanel {
         private GraphPanel(){
-            setDoubleBuffered(true);
-            //setSize(800, 100);
+            setVisible(true);
+            setSize(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight());
+            // setDoubleBuffered(true);
+            setBackground(Color.RED);
+
+//            addMouseListener(new MouseInputAdapter() {
+//                @Override
+//                public void mouseClicked(MouseEvent e) {
+//                    super.mouseClicked(e);
+//                }
+//
+//                @Override
+//                public void mousePressed(MouseEvent e) {
+//                    super.mousePressed(e);
+//                }
+//
+//                @Override
+//                public void mouseDragged(MouseEvent e) {
+//                    super.mouseDragged(e);
+//                }
+//
+//                @Override
+//                public void mouseMoved(MouseEvent event) {
+//                    super.mouseMoved(event);
+//                    System.out.println(getX() + ' ' + event.getX());
+//                    if (event.getX() == getX()) {
+//                        setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+//                    }
+//                }
+//            });
+            addMouseMotionListener(new MouseMotionListener() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseMoved(MouseEvent event) {
+                    System.out.println(getBounds());
+                    if (event.getX() == getX()) {
+                        setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                    }
+                }
+            });
         }
 
         public void drawNode(Graphics g, int centerX, int centerY, int width, int height, String text){
@@ -51,7 +98,7 @@ public class GraphDrawer extends JFrame {
             for (int i = 0; i < nodes.size(); i++){
                 x = (int)(radius * Math.cos(phi * i)) + getWidth()/2;
                 y = (int)(radius * Math.sin(phi * i)) + getHeight()/2;
-                drawNode(g, x, y, getWidth()/ DIVIDER, getHeight()/ DIVIDER, nodes.get(i));
+                drawNode(g, x, y, getWidth()/DIVIDER, getHeight()/DIVIDER, nodes.get(i));
                 coordinates.put(nodes.get(i), Pair.of(x, y));
             }
         }
@@ -88,17 +135,19 @@ public class GraphDrawer extends JFrame {
 
         private void createAlgorithmsPart() {
             add(new JLabel("Выбор алгоритма для запуска:"));
-            add(algorithms);
+            add(algorithmChoice);
             JButton startButton = new JButton("Запустить алгоритм");
             startButton.addActionListener(onStartButtonClick);
+            buttons.put(startButton.getText(), startButton);
             add(startButton);
             add(new JLabel("Выбор начальной вершины:"));
-            add(startNode);
+            add(startNodeChoice);
         }
 
         private void createServicePart() {
             JButton toMenu = new JButton("В главное меню");
             toMenu.addActionListener(onExitButtonClick);
+            buttons.put(toMenu.getText(), toMenu);
             add(toMenu, BorderLayout.EAST); // Почему-то не получается добавить кнопку к правому краю контейнера
         }
     }
@@ -109,9 +158,9 @@ public class GraphDrawer extends JFrame {
         this.edges = pairs;
         onExitButtonClick = onExit;
         onStartButtonClick = onStart;
-        startNode = new JComboBox<>(nodes.toArray(String[]::new));
-        algorithms = new JComboBox<>(new String[]{"BFS", "DFS"});
-        //paintingSequence = Collections.emptyList();
+        startNodeChoice = new JComboBox<>(nodes.toArray(String[]::new));
+        algorithmChoice = new JComboBox<>(new String[]{"BFS", "DFS"});
+        buttons = new HashMap<>();
 
         //Тут начало костылей
         //Можно не наследовать Circle от JComponent а просто прокидывать графикс и хранить лист Circle
@@ -121,7 +170,6 @@ public class GraphDrawer extends JFrame {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = screenSize.getWidth();
         double height = screenSize.getHeight();
-        setLayout(null);
         setSize((int) width, (int) height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -129,20 +177,18 @@ public class GraphDrawer extends JFrame {
         setVisible(true);
 
         GraphPanel graphPanel = new GraphPanel();
-        graphPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        //graphPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         add(graphPanel, BorderLayout.CENTER);
         add(new ButtonsPanel(), BorderLayout.NORTH);
     }
 
-    public String getStartNode() {
-        return (String) startNode.getSelectedItem();
+    public String getStartNodeChoice() {
+        return (String) startNodeChoice.getSelectedItem();
     }
 
     public String getAlgorithm() {
-        return (String) algorithms.getSelectedItem();
+        return (String) algorithmChoice.getSelectedItem();
     }
-
-    //public void setPaintingSequence(List<String> sequence) { paintingSequence = sequence; }
 
     public void illuminateNodes(List<String> paintingSequence) {
         for (String node : this.nodes){
@@ -159,6 +205,7 @@ public class GraphDrawer extends JFrame {
                 repaint();
             } else {
                 timer.stop();
+                buttons.get("Запустить алгоритм").setEnabled(true);
                 System.out.println("Stopped!");
             }
         });

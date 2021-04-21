@@ -10,11 +10,12 @@ public class AlgorithmRunner {
 
     }
 
-    public static <T> Graph<T> dfs(Node<T> startVertex, Graph<T> graph) {
+    public static <T> Graph<T> dfs(Node<T> startVertex, Graph<T> graph) { // баг с номерами вершин (вроде исправлено) (надо бы немного код отрефакторить и тестов добавить)
         int sequenceNumber = 0;
         var resultGraph = new Graph<T>();
         Stack<Node<T>> stack = new Stack<>();
         stack.push(startVertex);
+        startVertex.setSequenceNumber(sequenceNumber);
         var seenVertices = new HashSet<T>();
         seenVertices.add(startVertex.getValue());
         while (!stack.isEmpty()){

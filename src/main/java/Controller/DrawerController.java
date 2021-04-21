@@ -30,12 +30,15 @@ public class DrawerController {
         public void actionPerformed(ActionEvent e) {
             JButton origin = (JButton) e.getSource();
             if (origin.getText().equals("Запустить алгоритм")){
+                origin.setEnabled(false);
                 String algorithm = graphDrawer.getAlgorithm();
-                String startNode = graphDrawer.getStartNode();
+                String startNode = graphDrawer.getStartNodeChoice();
+                System.out.println(startNode);
                 switch (algorithm) {
                     case "BFS" -> AlgorithmRunner.bfs(graph.getNode(startNode), graph);
                     case "DFS" -> AlgorithmRunner.dfs(graph.getNode(startNode), graph);
                 }
+
                 graphDrawer.illuminateNodes(getNameSequence());
             }
         }
