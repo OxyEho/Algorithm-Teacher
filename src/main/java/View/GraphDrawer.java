@@ -117,6 +117,7 @@ public class GraphDrawer extends JFrame {
 
         @Override
         public void paintComponent(Graphics g){
+            super.paintComponent(g);
             drawNodes(g, nodes);
             drawEdges(g, edges, getWidth()/DIVIDER, getHeight()/DIVIDER);
             drawNodes(g, nodes);
@@ -170,10 +171,12 @@ public class GraphDrawer extends JFrame {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = screenSize.getWidth();
         double height = screenSize.getHeight();
-        setSize((int) width, (int) height);
+//        setSize((int) width, (int) height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setResizable(false);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         setVisible(true);
 
         GraphPanel graphPanel = new GraphPanel();
