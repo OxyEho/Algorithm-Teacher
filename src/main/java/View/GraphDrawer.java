@@ -34,7 +34,6 @@ public class GraphDrawer extends JFrame {
             setVisible(true);
             setSize(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight());
             // setDoubleBuffered(true);
-            setBackground(Color.RED);
 
 //            addMouseListener(new MouseInputAdapter() {
 //                @Override
