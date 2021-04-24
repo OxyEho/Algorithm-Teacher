@@ -33,7 +33,6 @@ public class DrawerController {
                 origin.setEnabled(false);
                 String algorithm = graphDrawer.getAlgorithm();
                 String startNode = graphDrawer.getStartNodeChoice();
-                System.out.println(startNode);
                 switch (algorithm) {
                     case "BFS" -> AlgorithmRunner.bfs(graph.getNode(startNode), graph);
                     case "DFS" -> AlgorithmRunner.dfs(graph.getNode(startNode), graph);

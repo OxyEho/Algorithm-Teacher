@@ -6,7 +6,6 @@ import java.awt.geom.Rectangle2D;
 
 public class Circle extends JComponent {
     private final String text;
-    // private int centerX, centerY;
     private int width, height;
     private Color color;
 
@@ -14,8 +13,6 @@ public class Circle extends JComponent {
         super();
         setVisible(true);
         this.text = text;
-//        this.centerX = centerX;
-//        this.centerY = centerY;
         this.width = width;
         this.height = height;
         this.color = color;
@@ -35,10 +32,6 @@ public class Circle extends JComponent {
         g.drawString(text, width / 2 - (int)r.getWidth() / 2,
                 height / 2 + (int)r.getHeight() / 4);
     }
-
-//    public void setCenterX(int centerX) { this.centerX = centerX; }
-//
-//    public void setCenterY(int centerY) { this.centerY = centerY; }
 
     public void setHeight(int height) { this.height = height; }
 
