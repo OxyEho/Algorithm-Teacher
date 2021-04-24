@@ -19,17 +19,16 @@ public class GraphDrawer extends JFrame {
     private final HashMap<String, JButton> buttons;
     private final JComboBox<String> startNodeChoice;
     private final JComboBox<String> algorithmChoice;
-    private final List<String> nodes;
     private final List<Pair<String, String>> edges;
     private final ActionListener onExitButtonClick;
     private final ActionListener onStartButtonClick;
     private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
     private final List<Circle> circles = new ArrayList<>();
 
-    private final HashMap<String, Color> colors = new HashMap<>();
+ //   private final HashMap<String, Color> colors = new HashMap<>();
 
     private class GraphPanel extends JPanel {
-        private GraphPanel(){
+        private GraphPanel(List<String> nodes){
             setVisible(true);
             setLayout(null);
             setPreferredSize(
@@ -37,7 +36,7 @@ public class GraphDrawer extends JFrame {
             );
             setDoubleBuffered(true);
             setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.GRAY, Color.GRAY));
-            //addNodes();
+            addNodes(nodes);
 //            addMouseMotionListener(new MouseMotionListener() {
 //                @Override
 //                public void mouseDragged(MouseEvent e) {
@@ -54,32 +53,28 @@ public class GraphDrawer extends JFrame {
 //            });
         }
 
-//        public void drawNode(Graphics g, int centerX, int centerY, int width, int height, String text){
-//            g.setColor(Color.BLACK);
-//            g.fillOval(centerX, centerY, width, height);
-//            g.setColor(colors.get(text));
-//            g.fillOval(centerX + 10,centerY + 10, width - 20, height - 20);
-//            g.setColor(Color.BLACK);
-//            Font font = new Font("TimesRoman", Font.PLAIN, height/3);
-//            g.setFont(font);
-//            Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
-//            g.drawString(text, centerX + width / 2 - (int)r.getWidth() / 2,
-//                    centerY + height / 2 + (int)r.getHeight() / 4);
-//        }
+        private void addNodes(List<String> nodes) {
+            for (String nodeName : nodes){
+                Circle circle = new Circle(0, 0, Color.WHITE, nodeName);
+                add(circle);
+                circles.add(circle);
+            }
+        }
 
-        private void addNodes() {
-            int radius = Math.min(getHeight()/4, getWidth()/4);
+        private void recalculateNodesCoordinates() {
+            int width = GraphDrawer.this.getWidth() / 2;
+            int height = GraphDrawer.this.getHeight();
+            int radius = Math.min(height/4, width/4);
             int x;
             int y;
-            double phi = 2 * Math.PI / nodes.size();
-            for (int i = 0; i < nodes.size(); i++){
-                x = (int)(radius * Math.cos(phi * i)) + getWidth()/2;
-                y = (int)(radius * Math.sin(phi * i)) + getHeight()/2;
-                var circle = new Circle(x, y, getWidth()/DIVIDER, getHeight()/DIVIDER, Color.WHITE, nodes.get(i));
-                this.add(circle);
-                circle.setLocation(x, y);
-                circles.add(circle);
-                coordinates.put(nodes.get(i), Pair.of(x, y));
+            double phi = 2 * Math.PI / circles.size();
+            for (int i = 0; i < circles.size(); i++){
+                x = (int)(radius * Math.cos(phi * i)) + width/2;
+                y = (int)(radius * Math.sin(phi * i)) + height/2;
+                circles.get(i).setHeight(height/DIVIDER + 10);
+                circles.get(i).setWidth(width/DIVIDER + 10);
+                circles.get(i).setBounds(x, y, width/DIVIDER + 10, height/DIVIDER + 10);
+                coordinates.put(circles.get(i).getText(), Pair.of(x, y));
             }
         }
 
@@ -98,14 +93,9 @@ public class GraphDrawer extends JFrame {
         @Override
         public void paintComponent(Graphics g){
             super.paintComponent(g);
-            // drawNodes(g, nodes);
+            recalculateNodesCoordinates();
 
-            addNodes();
-//            for (Circle circle : circles)
-//                circle.paintComponent(g);
-
-            //drawEdges(g, edges, getWidth()/DIVIDER, getHeight()/DIVIDER);
-            // drawNodes(g, nodes);
+            drawEdges(g, edges, getWidth()/DIVIDER, getHeight()/DIVIDER);
         }
     }
 
@@ -140,7 +130,6 @@ public class GraphDrawer extends JFrame {
 
     public GraphDrawer(ActionListener onExit, ActionListener onStart,
                        List<String> nodes, List<Pair<String, String>> pairs) {
-        this.nodes = nodes;
         this.edges = pairs;
         onExitButtonClick = onExit;
         onStartButtonClick = onStart;
@@ -148,11 +137,6 @@ public class GraphDrawer extends JFrame {
         algorithmChoice = new JComboBox<>(new String[]{"BFS", "DFS"});
         buttons = new HashMap<>();
 
-        //Тут начало костылей
-        //Можно не наследовать Circle от JComponent а просто прокидывать графикс и хранить лист Circle
-        for (String node : this.nodes){
-            colors.put(node, Color.WHITE);
-        }
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setResizable(false);
@@ -160,7 +144,7 @@ public class GraphDrawer extends JFrame {
         setUndecorated(true);
         setVisible(true);
 
-        GraphPanel graphPanel = new GraphPanel();
+        GraphPanel graphPanel = new GraphPanel(nodes);
         add(graphPanel, BorderLayout.WEST);
         add(new ButtonsPanel(), BorderLayout.NORTH);
     }
@@ -174,8 +158,8 @@ public class GraphDrawer extends JFrame {
     }
 
     public void illuminateNodes(List<String> paintingSequence) {
-        for (String node : this.nodes){
-            colors.put(node, Color.WHITE);
+        for (Circle circle : circles){
+            circle.setColor(Color.WHITE);
         }
         System.out.println("Invoked!");
         System.out.println(String.join(" ", paintingSequence));
@@ -183,7 +167,12 @@ public class GraphDrawer extends JFrame {
         final Timer timer = new Timer(1500, null);
         timer.addActionListener(tick -> {
             if (lastIndex.get() < paintingSequence.size()){
-                colors.put(paintingSequence.get(lastIndex.get()), Color.CYAN);
+                for (Circle circle : circles) {
+                    if (circle.getText().equals(paintingSequence.get(lastIndex.get()))) {
+                        circle.setColor(Color.ORANGE);
+                        break;
+                    }
+                }
                 lastIndex.getAndIncrement();
                 repaint();
             } else {
