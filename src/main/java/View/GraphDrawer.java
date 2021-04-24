@@ -1,29 +1,85 @@
 package View;
 
-import Controller.DrawerController;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.MouseInputListener;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GraphDrawer extends JFrame {
-    private static final int divider = 10;
-    private final DrawerController controller;
+    private static final int DIVIDER = 10;
+    private final HashMap<String, JButton> buttons;
+    private final JComboBox<String> startNodeChoice;
+    private final JComboBox<String> algorithmChoice;
+    private final List<String> nodes;
+    private final List<Pair<String, String>> edges;
+    private final ActionListener onExitButtonClick;
+    private final ActionListener onStartButtonClick;
     private final HashMap<String, Pair<Integer, Integer>> coordinates = new HashMap<>();
-    private class GraphPanel extends JPanel{
-        public GraphPanel(){
-            setDoubleBuffered(true);
+
+    private final HashMap<String, Color> colors = new HashMap<>();
+
+    private class GraphPanel extends JPanel {
+        private GraphPanel(){
+            setVisible(true);
+            setSize(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight());
+            // setDoubleBuffered(true);
+
+//            addMouseListener(new MouseInputAdapter() {
+//                @Override
+//                public void mouseClicked(MouseEvent e) {
+//                    super.mouseClicked(e);
+//                }
+//
+//                @Override
+//                public void mousePressed(MouseEvent e) {
+//                    super.mousePressed(e);
+//                }
+//
+//                @Override
+//                public void mouseDragged(MouseEvent e) {
+//                    super.mouseDragged(e);
+//                }
+//
+//                @Override
+//                public void mouseMoved(MouseEvent event) {
+//                    super.mouseMoved(event);
+//                    System.out.println(getX() + ' ' + event.getX());
+//                    if (event.getX() == getX()) {
+//                        setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+//                    }
+//                }
+//            });
+            addMouseMotionListener(new MouseMotionListener() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseMoved(MouseEvent event) {
+                    System.out.println(getBounds());
+                    if (event.getX() == getX()) {
+                        setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                    }
+                }
+            });
         }
 
         public void drawNode(Graphics g, int centerX, int centerY, int width, int height, String text){
             g.setColor(Color.BLACK);
             g.fillOval(centerX, centerY, width, height);
-            g.setColor(Color.WHITE);
+            g.setColor(colors.get(text));
             g.fillOval(centerX + 10,centerY + 10, width - 20, height - 20);
             g.setColor(Color.BLACK);
             Font font = new Font("TimesRoman", Font.PLAIN, height/3);
@@ -41,7 +97,7 @@ public class GraphDrawer extends JFrame {
             for (int i = 0; i < nodes.size(); i++){
                 x = (int)(radius * Math.cos(phi * i)) + getWidth()/2;
                 y = (int)(radius * Math.sin(phi * i)) + getHeight()/2;
-                drawNode(g, x, y, getWidth()/divider, getHeight()/divider, nodes.get(i));
+                drawNode(g, x, y, getWidth()/DIVIDER, getHeight()/DIVIDER, nodes.get(i));
                 coordinates.put(nodes.get(i), Pair.of(x, y));
             }
         }
@@ -59,25 +115,102 @@ public class GraphDrawer extends JFrame {
         }
 
         @Override
-        public void paint(Graphics g){
-            drawNodes(g, controller.getNodes());
-            drawEdges(g, controller.getEdges(), getWidth()/divider, getHeight()/divider);
-            drawNodes(g, controller.getNodes());
+        public void paintComponent(Graphics g){
+            super.paintComponent(g);
+            drawNodes(g, nodes);
+            drawEdges(g, edges, getWidth()/DIVIDER, getHeight()/DIVIDER);
+            drawNodes(g, nodes);
         }
     }
-    public GraphDrawer(DrawerController controller) {
-        this.controller = controller;
-        setLayout(null);
-        setSize(800, 800);
-        setVisible(true);
+
+    private class ButtonsPanel extends JPanel {
+        private ButtonsPanel(){
+            setLayout(new FlowLayout(FlowLayout.LEADING));
+            setVisible(true);
+            createAlgorithmsPart();
+            createServicePart();
+            setBackground(Color.getHSBColor(83.5F, 67, 88));
+            setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        }
+
+        private void createAlgorithmsPart() {
+            add(new JLabel("Выбор алгоритма для запуска:"));
+            add(algorithmChoice);
+            JButton startButton = new JButton("Запустить алгоритм");
+            startButton.addActionListener(onStartButtonClick);
+            buttons.put(startButton.getText(), startButton);
+            add(startButton);
+            add(new JLabel("Выбор начальной вершины:"));
+            add(startNodeChoice);
+        }
+
+        private void createServicePart() {
+            JButton toMenu = new JButton("В главное меню");
+            toMenu.addActionListener(onExitButtonClick);
+            buttons.put(toMenu.getText(), toMenu);
+            add(toMenu, BorderLayout.EAST); // Почему-то не получается добавить кнопку к правому краю контейнера
+        }
+    }
+
+    public GraphDrawer(ActionListener onExit, ActionListener onStart,
+                       List<String> nodes, List<Pair<String, String>> pairs) {
+        this.nodes = nodes;
+        this.edges = pairs;
+        onExitButtonClick = onExit;
+        onStartButtonClick = onStart;
+        startNodeChoice = new JComboBox<>(nodes.toArray(String[]::new));
+        algorithmChoice = new JComboBox<>(new String[]{"BFS", "DFS"});
+        buttons = new HashMap<>();
+
+        //Тут начало костылей
+        //Можно не наследовать Circle от JComponent а просто прокидывать графикс и хранить лист Circle
+        for (String node : this.nodes){
+            colors.put(node, Color.WHITE);
+        }
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double width = screenSize.getWidth();
+        double height = screenSize.getHeight();
+//        setSize((int) width, (int) height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout());
-        add(contentPanel, BorderLayout.CENTER);
+        setResizable(false);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
+        setVisible(true);
 
-        JPanel graphPanel = new GraphPanel();
-        graphPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        contentPanel.add(graphPanel, BorderLayout.CENTER);
+        GraphPanel graphPanel = new GraphPanel();
+        //graphPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        add(graphPanel, BorderLayout.CENTER);
+        add(new ButtonsPanel(), BorderLayout.NORTH);
+    }
+
+    public String getStartNodeChoice() {
+        return (String) startNodeChoice.getSelectedItem();
+    }
+
+    public String getAlgorithm() {
+        return (String) algorithmChoice.getSelectedItem();
+    }
+
+    public void illuminateNodes(List<String> paintingSequence) {
+        for (String node : this.nodes){
+            colors.put(node, Color.WHITE);
+        }
+        System.out.println("Invoked!");
+        System.out.println(String.join(" ", paintingSequence));
+        AtomicInteger lastIndex = new AtomicInteger();
+        final Timer timer = new Timer(1500, null);
+        timer.addActionListener(tick -> {
+            if (lastIndex.get() < paintingSequence.size()){
+                colors.put(paintingSequence.get(lastIndex.get()), Color.CYAN);
+                lastIndex.getAndIncrement();
+                repaint();
+            } else {
+                timer.stop();
+                buttons.get("Запустить алгоритм").setEnabled(true);
+                System.out.println("Stopped!");
+            }
+        });
+        timer.start();
     }
 }
