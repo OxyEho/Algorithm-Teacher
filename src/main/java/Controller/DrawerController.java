@@ -9,19 +9,19 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
 public class DrawerController {
-    private final Graph<String> graph;
+    private Graph<String> graph;
     private final ActionListener toMenuAction;
     private final GraphDrawer graphDrawer;
     public DrawerController(ActionListener toMenu, Graph<String> graph){
         this.graph = graph;
         toMenuAction = toMenu;
-        graphDrawer = new GraphDrawer(toMenu, new RunButtonListener(), getNodes(), getEdges());
+        graphDrawer = new GraphDrawer(toMenu, new RunButtonListener(), new GraphSizeFieldListener(),
+                new ShowGraphButtonListener(), getNodes(), getEdges());
     }
 
     private class RunButtonListener implements ActionListener {
@@ -40,6 +40,60 @@ public class DrawerController {
 
                 graphDrawer.illuminateNodes(getNameSequence());
             }
+        }
+    }
+
+    private class GraphSizeFieldListener implements ActionListener  {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try{
+                JTextField field = (JTextField) e.getSource();
+                int size = Integer.parseInt(field.getText());
+                graphDrawer.setTableSize(size);
+            } catch (NumberFormatException | ClassCastException numberFormatException) {
+                numberFormatException.printStackTrace();
+            }
+        }
+    }
+
+    private class ShowGraphButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try{
+                JButton origin = (JButton) e.getSource();
+                if (origin.getText().equals("Показать граф")){
+                    String[][] table = graphDrawer.getTable(); // i - строки
+                    graph = new Graph<>(parseGraph(table));
+                    graphDrawer.setNodesAndEdges(getNodes(), getEdges());
+                }
+            } catch (NumberFormatException numberFormatException) {
+                numberFormatException.printStackTrace();
+            }
+        }
+
+        private HashMap<String, Node<String>> parseGraph(String[][] table){
+            HashMap<String, ArrayList<String>> nodesWithAdjacency = new HashMap<>();
+
+            for (int i = 0; i < table.length; i++){
+                for (int j = 0; j < table.length; j++){
+                    if (i == 0 || j == 0) continue;
+                    if (Integer.parseInt(table[i][j]) != 0){
+                        if (nodesWithAdjacency.containsKey(table[i][0]))
+                            nodesWithAdjacency.get(table[i][0]).add(table[0][j]);
+                        else
+                            nodesWithAdjacency.put(table[i][0], new ArrayList<>(Collections.singleton(table[0][j])));
+                    }
+                }
+            }
+
+            HashMap<String, Node<String>> result = new HashMap<>();
+            for (String key : nodesWithAdjacency.keySet()){
+                result.put(key, new Node<>(key, nodesWithAdjacency.get(key)));
+            }
+
+            return result;
         }
     }
 

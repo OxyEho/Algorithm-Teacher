@@ -7,10 +7,12 @@ import java.util.*;
 public class Graph<T>{
     private final HashMap<T, Node<T>> baseMap;
     private ArrayList<Pair<T, T>> edges;
+
     public Graph(HashMap<T, Node<T>> baseMap){
         this.baseMap = baseMap;
         this.edges = makeEdges();
     }
+
     public Graph(){ baseMap = new HashMap<>(); }
 
 

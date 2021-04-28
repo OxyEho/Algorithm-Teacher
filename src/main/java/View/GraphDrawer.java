@@ -20,40 +20,73 @@ public class GraphDrawer extends JFrame {
     private final HashMap<String, JButton> buttons; // Из этого всего можно сделать мапу и объявить её в абстрактном классе
     private final JComboBox<String> startNodeChoice; // (но мне пока не хочется этого делать)
     private final JComboBox<String> algorithmChoice;
-    private final List<Circle> circles = new ArrayList<>();
+    private List<Circle> circles = new ArrayList<>();
+    private JTable table; // Либо храним GraphCreator здесь, либо как-то перегружаем конструктор
+    private final GraphPanel graphPanel;
 
     private class GraphCreator extends JPanel {
-        private GraphCreator(List<String> nodes, List<Pair<String, String>> pairs) {
+        private static final int CELL_SIZE = 60;
+
+        private GraphCreator(List<String> nodes, List<Pair<String, String>> pairs,
+                             ActionListener sizeListener, ActionListener matrixListener) {
             super();
             setVisible(true);
             setLayout(null);
             setPreferredSize(new Dimension(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight()));
             setDoubleBuffered(true);
             setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.GRAY, Color.GRAY));
-            addTable(nodes.size() + 1, nodes, pairs);
+            addTableWithInfrastructure(nodes.size() + 1, nodes, pairs, sizeListener, matrixListener);
         }
 
-        private void addTable(int size, List<String> nodes, List<Pair<String, String>> pairs) {
-            JTable table = new JTable(size, size);
+        private void addTableWithInfrastructure(int size, List<String> nodes, List<Pair<String, String>> pairs,
+                                                ActionListener sizeListener, ActionListener matrixListener) {
+            JPanel container = new JPanel();
+            GroupLayout layout = new GroupLayout(container);
+            layout.setAutoCreateGaps(true);
+            layout.setAutoCreateContainerGaps(true);
+            container.setLayout(layout);
+            container.setBounds(
+                    80, 85, GraphDrawer.this.getWidth() / 2 - 80, GraphDrawer.this.getHeight() / 2 - 85
+            );
+            table = new JTable(size, size);
+            JLabel sizeLabel = new JLabel("Размер: ");
+            JTextField sizeField = new JTextField();
+            sizeField.addActionListener(sizeListener);
+            JButton button = new JButton("Показать граф");
+            button.addActionListener(matrixListener);
+
             table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            table.setSize(new Dimension(30 * size, 30 * size));
+            table.setSize(new Dimension(CELL_SIZE * size, CELL_SIZE * size));
             setTableSize(table);
             setGraph(table, size, nodes, pairs);
-            table.setBounds(30, 30, table.getWidth(), table.getWidth());
             table.setRowSelectionAllowed(false);
-            add(table);
+            table.setFont(new Font("Microsoft JhengHei", Font.BOLD, 26));
+
+            layout.setHorizontalGroup(
+                    layout.createParallelGroup().addGroup(
+                            layout.createSequentialGroup().addComponent(sizeLabel).addComponent(sizeField).addComponent(button)
+                    ).addComponent(table)
+            );
+            layout.linkSize(sizeField, sizeLabel);
+            layout.setVerticalGroup(
+                    layout.createSequentialGroup().addGroup(
+                            layout.createParallelGroup().addComponent(sizeLabel).addComponent(sizeField).addComponent(button)
+                    ).addComponent(table)
+            );
+
+            add(container);
         }
 
         private void setTableSize(JTable table) {
-            table.setRowHeight(30);
+            table.setRowHeight(CELL_SIZE);
             for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
                 TableColumn column = table.getColumnModel().getColumn(i);
-                column.setMaxWidth(30);
+                column.setMaxWidth(CELL_SIZE);
             }
         }
 
         private void setGraph(JTable table, int size, List<String> nodes, List<Pair<String, String>> pairs) {
-            DefaultTableModel model = (DefaultTableModel)table.getModel();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
             for (int i = 0; i < size - 1; i++) {
                 model.setValueAt(nodes.get(i), 0, i+1);
                 model.setValueAt(nodes.get(i), i+1, 0);
@@ -74,19 +107,21 @@ public class GraphDrawer extends JFrame {
 
     private class GraphPanel extends AbstractGraphPanel {
         private final int preferredWidth, preferredHeight;
-        private final HashMap<String, Pair<Integer, Integer>> coordinates;
-        private final List<Pair<String, String>> edges;
+        private HashMap<String, Pair<Integer, Integer>> coordinates;
+        private List<Pair<String, String>> edges;
+        private List<String> nodes;
 
         private GraphPanel(List<String> nodes, List<Pair<String, String>> edges){
             super(new Dimension(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight()));
             preferredWidth = GraphDrawer.this.getWidth() / 2;
             preferredHeight = GraphDrawer.this.getHeight();
             coordinates = new HashMap<>();
+            this.nodes = nodes;
             this.edges = edges;
-            addNodes(nodes);
+            addNodes();
         }
 
-        private void addNodes(List<String> nodes) {
+        private void addNodes() {
             for (String nodeName : nodes){
                 Circle circle = new Circle(0, 0, Color.WHITE, nodeName);
                 add(circle);
@@ -126,6 +161,16 @@ public class GraphDrawer extends JFrame {
             recalculateNodesCoordinates();
             drawEdges(g, edges, getWidth()/DIVIDER, getHeight()/DIVIDER);
         }
+
+        public void setNodesAndEdges(List<String> nodes, List<Pair<String, String>> edges) {
+            this.nodes = nodes;
+            this.edges = edges;
+            circles = new ArrayList<>();
+            coordinates = new HashMap<>();
+            removeAll();
+            addNodes();
+            repaint();
+        }
     }
 
     private class ButtonsPanel extends AbstractButtonsPanel {
@@ -134,7 +179,6 @@ public class GraphDrawer extends JFrame {
             super(new Dimension(GraphDrawer.this.getWidth(), GraphDrawer.this.getHeight() / 20));
             createAlgorithmsPart(onStartButtonClick);
             createServicePart(onExitButtonClick);
-
         }
 
         private void createAlgorithmsPart(ActionListener onStartButtonClick) {
@@ -146,6 +190,7 @@ public class GraphDrawer extends JFrame {
             startButton.addActionListener(onStartButtonClick);
             buttons.put(startButton.getText(), startButton);
             constraints.gridx++;
+            constraints.fill = GridBagConstraints.NONE;
             add(startButton, constraints);
             constraints.gridx++;
             add(new JLabel("Выбор начальной вершины:"), constraints);
@@ -158,12 +203,14 @@ public class GraphDrawer extends JFrame {
             toMenu.addActionListener(onExitButtonClick);
             buttons.put(toMenu.getText(), toMenu);
             constraints.gridx++;
-            add(toMenu, constraints); // Почему-то не получается добавить кнопку к правому краю контейнера
+            add(toMenu, constraints);
         }
     }
 
     public GraphDrawer(ActionListener onExit, ActionListener onStart,
+                       ActionListener sizeListener, ActionListener matrixListener,
                        List<String> nodes, List<Pair<String, String>> pairs) {
+
         startNodeChoice = new JComboBox<>(nodes.toArray(String[]::new));
         algorithmChoice = new JComboBox<>(new String[]{"BFS", "DFS"});
         buttons = new HashMap<>();
@@ -175,8 +222,8 @@ public class GraphDrawer extends JFrame {
         setUndecorated(true);
         setVisible(true);
 
-        GraphPanel graphPanel = new GraphPanel(nodes, pairs);
-        GraphCreator graphCreator = new GraphCreator(nodes, pairs);
+        graphPanel = new GraphPanel(nodes, pairs);
+        GraphCreator graphCreator = new GraphCreator(nodes, pairs, sizeListener, matrixListener);
         add(graphPanel, BorderLayout.WEST);
         add(new ButtonsPanel(onStart, onExit), BorderLayout.NORTH);
         add(graphCreator, BorderLayout.EAST);
@@ -188,7 +235,40 @@ public class GraphDrawer extends JFrame {
 
     public String getAlgorithm() { return (String) algorithmChoice.getSelectedItem(); }
 
-    public void illuminateNodes(List<String> paintingSequence) {
+    public String[][] getTable() {
+        String[][] result = new String[table.getRowCount()][table.getRowCount()];
+        Object current;
+        for (int i = 0; i < table.getRowCount(); i++){
+            for (int j = 0; j < table.getRowCount(); j++){
+                current = table.getModel().getValueAt(i, j);
+                if (current != null)
+                    result[i][j] = current.toString();
+                else
+                    result[i][j] = "";
+            }
+        }
+
+        return result;
+    }
+
+    public void setTableSize(int size) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (i == 0 || j ==0)
+                    model.setValueAt("name" + (i + j), i, j);
+                else
+                    model.setValueAt(0, i, j);
+            }
+        }
+    }
+
+    public void setNodesAndEdges(List<String> nodes, List<Pair<String, String>> edges) {
+        graphPanel.setNodesAndEdges(nodes, edges);
+    }
+
+    public void illuminateNodes(List<String> paintingSequence) { // А может можно это занести в GraphPanel?
         for (Circle circle : circles)
             circle.setColor(Color.WHITE);
 
