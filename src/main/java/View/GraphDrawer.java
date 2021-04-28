@@ -1,10 +1,13 @@
 package View;
 
 import View.AbstractPanels.AbstractButtonsPanel;
-import View.AbstractPanels.AbstractGraphDrawer;
+import View.AbstractPanels.AbstractGraphPanel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -19,7 +22,57 @@ public class GraphDrawer extends JFrame {
     private final JComboBox<String> algorithmChoice;
     private final List<Circle> circles = new ArrayList<>();
 
-    private class GraphPanel extends AbstractGraphDrawer {
+    private class GraphCreator extends JPanel {
+        private GraphCreator(List<String> nodes, List<Pair<String, String>> pairs) {
+            super();
+            setVisible(true);
+            setLayout(null);
+            setPreferredSize(new Dimension(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight()));
+            setDoubleBuffered(true);
+            setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.GRAY, Color.GRAY));
+            addTable(nodes.size() + 1, nodes, pairs);
+        }
+
+        private void addTable(int size, List<String> nodes, List<Pair<String, String>> pairs) {
+            JTable table = new JTable(size, size);
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            table.setSize(new Dimension(30 * size, 30 * size));
+            setTableSize(table);
+            setGraph(table, size, nodes, pairs);
+            table.setBounds(30, 30, table.getWidth(), table.getWidth());
+            table.setRowSelectionAllowed(false);
+            add(table);
+        }
+
+        private void setTableSize(JTable table) {
+            table.setRowHeight(30);
+            for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+                TableColumn column = table.getColumnModel().getColumn(i);
+                column.setMaxWidth(30);
+            }
+        }
+
+        private void setGraph(JTable table, int size, List<String> nodes, List<Pair<String, String>> pairs) {
+            DefaultTableModel model = (DefaultTableModel)table.getModel();
+            for (int i = 0; i < size - 1; i++) {
+                model.setValueAt(nodes.get(i), 0, i+1);
+                model.setValueAt(nodes.get(i), i+1, 0);
+            }
+            for (int i = 1; i < size; i++) {
+                for (int j = 1; j < size; j++) {
+                    model.setValueAt(0, i, j);
+                }
+            }
+
+            for (Pair<String, String> pair: pairs) {
+                int x = nodes.indexOf(pair.getLeft());
+                int y = nodes.indexOf(pair.getRight());
+                model.setValueAt(1, x + 1, y + 1);
+            }
+        }
+    }
+
+    private class GraphPanel extends AbstractGraphPanel {
         private final int preferredWidth, preferredHeight;
         private final HashMap<String, Pair<Integer, Integer>> coordinates;
         private final List<Pair<String, String>> edges;
@@ -123,8 +176,10 @@ public class GraphDrawer extends JFrame {
         setVisible(true);
 
         GraphPanel graphPanel = new GraphPanel(nodes, pairs);
+        GraphCreator graphCreator = new GraphCreator(nodes, pairs);
         add(graphPanel, BorderLayout.WEST);
         add(new ButtonsPanel(onStart, onExit), BorderLayout.NORTH);
+        add(graphCreator, BorderLayout.EAST);
     }
 
     public String getStartNodeChoice() {

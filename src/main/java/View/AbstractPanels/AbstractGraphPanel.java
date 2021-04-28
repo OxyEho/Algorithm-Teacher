@@ -6,8 +6,8 @@ import javax.swing.border.BevelBorder;
 import java.awt.Color;
 import java.awt.Dimension;
 
-public class AbstractGraphDrawer extends JPanel {
-    public AbstractGraphDrawer(Dimension preferredSize) {
+public class AbstractGraphPanel extends JPanel {
+    public AbstractGraphPanel(Dimension preferredSize) {
         setVisible(true);
         setLayout(null);
         setPreferredSize(preferredSize);
