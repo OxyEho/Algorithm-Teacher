@@ -47,7 +47,7 @@ public class DrawerController {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try{
+            try {
                 JTextField field = (JTextField) e.getSource();
                 int size = Integer.parseInt(field.getText());
                 graphDrawer.setTableSize(size);
@@ -61,9 +61,9 @@ public class DrawerController {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try{
+            try {
                 JButton origin = (JButton) e.getSource();
-                if (origin.getText().equals("Показать граф")){
+                if (origin.getText().equals("Показать граф")) {
                     String[][] table = graphDrawer.getTable(); // i - строки
                     graph = new Graph<>(parseGraph(table));
                     graphDrawer.setNodesAndEdges(getNodes(), getEdges());

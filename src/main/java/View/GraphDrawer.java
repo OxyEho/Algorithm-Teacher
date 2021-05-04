@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GraphDrawer extends JFrame {
     private static final int DIVIDER = 10;
     private final HashMap<String, JButton> buttons; // Из этого всего можно сделать мапу и объявить её в абстрактном классе
-    private final JComboBox<String> startNodeChoice; // (но мне пока не хочется этого делать)
+    private JComboBox<String> startNodeChoice; // (но мне пока не хочется этого делать)
     private final JComboBox<String> algorithmChoice;
     private List<Circle> circles = new ArrayList<>();
     private JTable table; // Либо храним GraphCreator здесь, либо как-то перегружаем конструктор
@@ -167,6 +167,8 @@ public class GraphDrawer extends JFrame {
             this.edges = edges;
             circles = new ArrayList<>();
             coordinates = new HashMap<>();
+            for (var node: nodes)
+                GraphDrawer.this.startNodeChoice.addItem(node);
             removeAll();
             addNodes();
             repaint();
