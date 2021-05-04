@@ -61,8 +61,8 @@ public class GraphDrawer extends JFrame {
 
             table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
             table.setSize(new Dimension(CELL_SIZE * size, CELL_SIZE * size));
-            setTableSize(table);
-            setGraph(table, size, nodes, pairs);
+            setCellSizes();
+            setTableValues(size, nodes, pairs);
             table.setRowSelectionAllowed(false);
             table.setFont(new Font("Microsoft JhengHei", Font.BOLD, 26));
 
@@ -81,7 +81,7 @@ public class GraphDrawer extends JFrame {
             add(container);
         }
 
-        private void setTableSize(JTable table) {
+        private void setCellSizes() {
             table.setRowHeight(CELL_SIZE);
             for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
                 TableColumn column = table.getColumnModel().getColumn(i);
@@ -89,7 +89,7 @@ public class GraphDrawer extends JFrame {
             }
         }
 
-        private void setGraph(JTable table, int size, List<String> nodes, List<Pair<String, String>> pairs) {
+        private void setTableValues(int size, List<String> nodes, List<Pair<String, String>> pairs) {
             DefaultTableModel model = (DefaultTableModel) table.getModel();
             for (int i = 0; i < size - 1; i++) {
                 model.setValueAt(nodes.get(i), 0, i+1);
@@ -260,24 +260,24 @@ public class GraphDrawer extends JFrame {
         return result;
     }
 
+    private void addColumns(int size) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(size);
+        model.setColumnCount(size);
+    }
+
     public void setTableSize(int size) {
-        graphCreator.removeAll();
         List<String> names = new ArrayList<>();
         for (int i = 1; i < size + 1; i++)
             names.add("name" + i);
-        graphCreator.addTableWithInfrastructure(size + 1, names, Collections.emptyList());
-        repaint();
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        for (int i = model.getColumnCount() - 1; i >= 0 ; i--) {
+            TableColumn c = table.getColumnModel().getColumn(i);
+            table.removeColumn(c);
+        }
+        addColumns(size + 1);
+        graphCreator.setTableValues(size + 1, names, Collections.emptyList());
         System.out.println("table is updated");
-//        DefaultTableModel model = (DefaultTableModel) table.getModel();
-//
-//        for (int i = 0; i < size; i++) {
-//            for (int j = 0; j < size; j++) {
-//                if (i == 0 || j ==0)
-//                    model.setValueAt("name" + (i + j), i, j);
-//                else
-//                    model.setValueAt(0, i, j);
-//            }
-//        }
     }
 
     public void setNodesAndEdges(List<String> nodes, List<Pair<String, String>> edges) {
