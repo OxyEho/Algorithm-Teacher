@@ -24,12 +24,22 @@ public class DrawerController {
                 new ShowGraphButtonListener(), getNodes(), getEdges());
     }
 
+    /**
+     * -1 здесь есть значение по умолчанию.
+     * Detour здесь есть обход.
+     */
+    private void setDefaultDetourOrder() {
+        for (Node<String> node : graph.getNodeList())
+            node.setSequenceNumber(-1);
+    }
+
     private class RunButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             JButton origin = (JButton) e.getSource();
             if (origin.getText().equals("Запустить алгоритм")){
+                setDefaultDetourOrder();
                 origin.setEnabled(false);
                 String algorithm = graphDrawer.getAlgorithm();
                 String startNode = graphDrawer.getStartNodeChoice();
@@ -75,6 +85,9 @@ public class DrawerController {
 
         private HashMap<String, Node<String>> parseGraph(String[][] table){
             HashMap<String, ArrayList<String>> nodesWithAdjacency = new HashMap<>();
+            for (int i = 1; i < table.length; i++)
+                if (!nodesWithAdjacency.containsKey(table[0][i]))
+                    nodesWithAdjacency.put(table[0][i], new ArrayList<>());
 
             for (int i = 0; i < table.length; i++){
                 for (int j = 0; j < table.length; j++){
@@ -82,8 +95,8 @@ public class DrawerController {
                     if (Integer.parseInt(table[i][j]) != 0){
                         if (nodesWithAdjacency.containsKey(table[i][0]))
                             nodesWithAdjacency.get(table[i][0]).add(table[0][j]);
-                        else
-                            nodesWithAdjacency.put(table[i][0], new ArrayList<>(Collections.singleton(table[0][j])));
+//                        else
+//                            nodesWithAdjacency.put(table[i][0], new ArrayList<>(Collections.singleton(table[0][j])));
                     }
                 }
             }
@@ -116,6 +129,7 @@ public class DrawerController {
                 .getNodeList()
                 .stream()
                 .sorted(Comparator.comparingInt(Node::getSequenceNumber))
+                .filter(node -> node.getSequenceNumber() != -1)
                 .map(Node::getValue)
                 .collect(Collectors.toList());
     }
