@@ -167,8 +167,11 @@ public class GraphDrawer extends JFrame {
             this.edges = edges;
             circles = new ArrayList<>();
             coordinates = new HashMap<>();
-            for (var node: nodes)
-                GraphDrawer.this.startNodeChoice.addItem(node);
+            startNodeChoice.removeAllItems();
+            for (var node: nodes) {
+                startNodeChoice.addItem(node);
+                System.out.println(node);
+            }
             removeAll();
             addNodes();
             repaint();
