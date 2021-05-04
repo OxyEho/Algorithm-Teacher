@@ -11,6 +11,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,9 +24,11 @@ public class GraphDrawer extends JFrame {
     private List<Circle> circles = new ArrayList<>();
     private JTable table; // Либо храним GraphCreator здесь, либо как-то перегружаем конструктор
     private final GraphPanel graphPanel;
+    private final GraphCreator graphCreator;
 
     private class GraphCreator extends JPanel {
         private static final int CELL_SIZE = 60;
+        private final ActionListener sizeListener, matrixListener;
 
         private GraphCreator(List<String> nodes, List<Pair<String, String>> pairs,
                              ActionListener sizeListener, ActionListener matrixListener) {
@@ -35,11 +38,12 @@ public class GraphDrawer extends JFrame {
             setPreferredSize(new Dimension(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight()));
             setDoubleBuffered(true);
             setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.GRAY, Color.GRAY));
-            addTableWithInfrastructure(nodes.size() + 1, nodes, pairs, sizeListener, matrixListener);
+            this.sizeListener = sizeListener;
+            this.matrixListener = matrixListener;
+            addTableWithInfrastructure(nodes.size() + 1, nodes, pairs);
         }
 
-        private void addTableWithInfrastructure(int size, List<String> nodes, List<Pair<String, String>> pairs,
-                                                ActionListener sizeListener, ActionListener matrixListener) {
+        private void addTableWithInfrastructure(int size, List<String> nodes, List<Pair<String, String>> pairs) {
             JPanel container = new JPanel();
             GroupLayout layout = new GroupLayout(container);
             layout.setAutoCreateGaps(true);
@@ -228,7 +232,7 @@ public class GraphDrawer extends JFrame {
         setVisible(true);
 
         graphPanel = new GraphPanel(nodes, pairs);
-        GraphCreator graphCreator = new GraphCreator(nodes, pairs, sizeListener, matrixListener);
+        graphCreator = new GraphCreator(nodes, pairs, sizeListener, matrixListener);
         add(graphPanel, BorderLayout.WEST);
         add(new ButtonsPanel(onStart, onExit), BorderLayout.NORTH);
         add(graphCreator, BorderLayout.EAST);
@@ -257,16 +261,23 @@ public class GraphDrawer extends JFrame {
     }
 
     public void setTableSize(int size) {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (i == 0 || j ==0)
-                    model.setValueAt("name" + (i + j), i, j);
-                else
-                    model.setValueAt(0, i, j);
-            }
-        }
+        graphCreator.removeAll();
+        List<String> names = new ArrayList<>();
+        for (int i = 1; i < size + 1; i++)
+            names.add("name" + i);
+        graphCreator.addTableWithInfrastructure(size + 1, names, Collections.emptyList());
+        repaint();
+        System.out.println("table is updated");
+//        DefaultTableModel model = (DefaultTableModel) table.getModel();
+//
+//        for (int i = 0; i < size; i++) {
+//            for (int j = 0; j < size; j++) {
+//                if (i == 0 || j ==0)
+//                    model.setValueAt("name" + (i + j), i, j);
+//                else
+//                    model.setValueAt(0, i, j);
+//            }
+//        }
     }
 
     public void setNodesAndEdges(List<String> nodes, List<Pair<String, String>> edges) {
