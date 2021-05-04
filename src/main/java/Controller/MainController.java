@@ -2,7 +2,6 @@ package Controller;
 
 import Models.Graph;
 import Models.Node;
-import View.GraphDrawer;
 import View.MainWindow;
 
 import javax.swing.*;
@@ -13,20 +12,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class MainController {
-    static { }
     private static MainWindow mainWindow;
-    private static GraphDrawer graphDrawer;
+    private static DrawerController drawerController;
+    private static ToMenuButtonListener toMenuButtonListener;
     private static final Graph<String> defaultGraph = new Graph<>(new HashMap<>(){
         {
-            put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "c", "d", "e")))));
-            put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a", "c", "d", "e")))));
-            put("c", (new Node<>("c", new ArrayList<>(Arrays.asList("b", "a", "d", "e")))));
-            put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("b", "c", "a", "e")))));
-            put("e", (new Node<>("e", new ArrayList<>(Arrays.asList("b", "c", "d", "a")))));
+            put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "e")))));
+            put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a", "c")))));
+            put("c", (new Node<>("c", new ArrayList<>(Arrays.asList("b", "d")))));
+            put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("c")))));
+            put("e", (new Node<>("e", new ArrayList<>(Arrays.asList("a")))));
         }
     }); // K5
 
     public static void main(String[] args) {
+        toMenuButtonListener = new ToMenuButtonListener();
         mainWindow = new MainWindow(new MenuButtonListener());
         mainWindow.repaint();
     }
@@ -37,7 +37,7 @@ public class MainController {
             JButton origin = (JButton) e.getSource();
             if (origin.getText().equals("View")){
                 mainWindow.dispose();
-                graphDrawer = new GraphDrawer(new ToMenuButtonListener(), new DrawerController(defaultGraph));
+                drawerController = new DrawerController(toMenuButtonListener, defaultGraph);
             }
 
         }
@@ -47,9 +47,7 @@ public class MainController {
         @Override
         public void actionPerformed(ActionEvent e) {
             mainWindow.setVisible(true);
-            System.out.println(e.getActionCommand());
-            System.out.println(e.getSource() == graphDrawer);
-            graphDrawer.dispose();
+            drawerController.getGraphDrawer().dispose();
         }
     }
 }

@@ -1,26 +1,43 @@
 package View;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class Circle extends JComponent {
     private final String text;
-    private final Pair<Integer, Integer> size;
-    public Circle(String text, Pair<Integer, Integer> size){
+    private int width, height;
+    private Color color;
+
+    public Circle(int width, int height, Color color, String text){
+        super();
+        setVisible(true);
         this.text = text;
-        this.size = size;
+        this.width = width;
+        this.height = height;
+        this.color = color;
     }
 
     @Override
     public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         g.setColor(Color.BLACK);
-        g.fillOval(0, 0, this.size.getLeft() - 10, this.size.getRight() - 10);
-        g.setColor(Color.WHITE);
-        g.fillOval(10, 10, this.size.getLeft() - 30, this.size.getRight() - 30);
+        g.fillOval(0, 0, width, height);
+        g.setColor(color);
+        g.fillOval(10,10, width - 20, height - 20);
         g.setColor(Color.BLACK);
-        g.setFont(new Font("TimesRoman", Font.PLAIN, 40));
-        g.drawString(text, 35, 55);
+        Font font = new Font("TimesRoman", Font.PLAIN, height/3);
+        g.setFont(font);
+        Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
+        g.drawString(text, width / 2 - (int)r.getWidth() / 2,
+                height / 2 + (int)r.getHeight() / 4);
     }
+
+    public void setHeight(int height) { this.height = height; }
+
+    public void setWidth(int width) { this.width = width; }
+
+    public void setColor(Color color) { this.color = color; }
+
+    public String getText() { return text; }
 }

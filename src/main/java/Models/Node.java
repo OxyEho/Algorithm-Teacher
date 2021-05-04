@@ -6,6 +6,7 @@ import java.util.Collection;
 public class Node<T> {
     private final T value;
     private final ArrayList<T> adjacency;
+    private int sequenceNumber;
 
     public Node(T value, ArrayList<T> adjacencyList) {
         this.value = value;
@@ -19,6 +20,12 @@ public class Node<T> {
     }
 
     public T getValue() { return value; }
+
+    public int getSequenceNumber() { return sequenceNumber; }
+
+    public void setSequenceNumber(int sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+    }
 
     @Override
     public String toString() { return value.toString(); }
