@@ -70,6 +70,7 @@ public class GraphDrawer extends JFrame {
             table.getTableHeader().setEnabled(false);
             table.setFont(new Font("Microsoft JhengHei", Font.BOLD, 26));
             JList<String> rowHeader = getRowHeader(nodes);
+            rowHeader.setFixedCellHeight(CELL_SIZE);
             scrollPane.setRowHeaderView(rowHeader);
             layout.setHorizontalGroup(
                     layout.createParallelGroup().addGroup(
@@ -87,6 +88,7 @@ public class GraphDrawer extends JFrame {
         }
 
         private JList<String> getRowHeader(List<String> nodes) {
+            nodes.add(0, "");
             ListModel<String> listModel = new AbstractListModel<>() {
                 final String[] headers = nodes.toArray(String[]::new);
                 public int getSize() { return headers.length; }
