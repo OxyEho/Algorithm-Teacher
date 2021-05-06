@@ -45,6 +45,7 @@ public class GraphDrawer extends JFrame {
 
         private void addTableWithInfrastructure(int size, List<String> nodes, List<Pair<String, String>> pairs) {
             JPanel container = new JPanel();
+            JScrollPane scrollPane = new JScrollPane();
             GroupLayout layout = new GroupLayout(container);
             layout.setAutoCreateGaps(true);
             layout.setAutoCreateContainerGaps(true);
@@ -58,27 +59,51 @@ public class GraphDrawer extends JFrame {
             sizeField.addActionListener(sizeListener);
             JButton button = new JButton("Показать граф");
             button.addActionListener(matrixListener);
-
             table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
             table.setSize(new Dimension(CELL_SIZE * size, CELL_SIZE * size));
-            setCellSizes();
-            setTableValues(size, nodes, pairs);
-            table.setRowSelectionAllowed(false);
-            table.setFont(new Font("Microsoft JhengHei", Font.BOLD, 26));
 
+            setCellSizes();
+            setColumnHeaders(nodes);
+            setTableValues(size, nodes, pairs);
+            scrollPane.getViewport().add(table);
+            table.setRowSelectionAllowed(false);
+            table.getTableHeader().setEnabled(false);
+            table.setFont(new Font("Microsoft JhengHei", Font.BOLD, 26));
+            JList<String> rowHeader = getRowHeader(nodes);
+            scrollPane.setRowHeaderView(rowHeader);
             layout.setHorizontalGroup(
                     layout.createParallelGroup().addGroup(
                             layout.createSequentialGroup().addComponent(sizeLabel).addComponent(sizeField).addComponent(button)
-                    ).addComponent(table)
+                    ).addComponent(scrollPane)
             );
             layout.linkSize(sizeField, sizeLabel);
             layout.setVerticalGroup(
                     layout.createSequentialGroup().addGroup(
                             layout.createParallelGroup().addComponent(sizeLabel).addComponent(sizeField).addComponent(button)
-                    ).addComponent(table)
+                    ).addComponent(scrollPane)
             );
 
             add(container);
+        }
+
+        private JList<String> getRowHeader(List<String> nodes) {
+            ListModel<String> listModel = new AbstractListModel<>() {
+                final String[] headers = nodes.toArray(String[]::new);
+                public int getSize() { return headers.length; }
+                public String getElementAt(int index) {
+                    return headers[index];
+                }
+            };
+            return new JList<>(listModel);
+        }
+
+        private void setColumnHeaders(List<String> nodes) {
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                if (i == 0)
+                    table.getColumnModel().getColumn(i).setHeaderValue("");
+                else
+                    table.getColumnModel().getColumn(i).setHeaderValue(nodes.get(i-1));
+            }
         }
 
         private void setCellSizes() {
@@ -276,6 +301,8 @@ public class GraphDrawer extends JFrame {
             table.removeColumn(c);
         }
         addColumns(size + 1);
+        graphCreator.setCellSizes();
+        graphCreator.setColumnHeaders(names);
         graphCreator.setTableValues(size + 1, names, Collections.emptyList());
         System.out.println("table is updated");
     }
