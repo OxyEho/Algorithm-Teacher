@@ -28,9 +28,9 @@ public class Circle extends JComponent {
         g.setColor(Color.BLACK);
         Font font = new Font("TimesRoman", Font.PLAIN, height/3);
         g.setFont(font);
-        Rectangle2D r = g.getFontMetrics().getStringBounds(text, g);
-        g.drawString(text, width / 2 - (int)r.getWidth() / 2,
-                height / 2 + (int)r.getHeight() / 4);
+        Rectangle2D rect = g.getFontMetrics().getStringBounds(text, g);
+        g.drawString(text, width / 2 - (int)rect.getWidth() / 2,
+                height / 2 + (int)rect.getHeight() / 4);
     }
 
     public void setHeight(int height) { this.height = height; }

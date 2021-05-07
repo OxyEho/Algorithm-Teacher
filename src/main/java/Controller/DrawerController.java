@@ -7,6 +7,10 @@ import View.GraphDrawer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -95,8 +99,6 @@ public class DrawerController {
                     if (Integer.parseInt(table[i][j]) != 0){
                         if (nodesWithAdjacency.containsKey(table[i][0]))
                             nodesWithAdjacency.get(table[i][0]).add(table[0][j]);
-//                        else
-//                            nodesWithAdjacency.put(table[i][0], new ArrayList<>(Collections.singleton(table[0][j])));
                     }
                 }
             }

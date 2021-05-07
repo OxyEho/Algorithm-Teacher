@@ -29,6 +29,7 @@ public class GraphDrawer extends JFrame {
     private class GraphCreator extends JPanel {
         private static final int CELL_SIZE = 60;
         private final ActionListener sizeListener, matrixListener;
+        private JScrollPane scrollPane;
 
         private GraphCreator(List<String> nodes, List<Pair<String, String>> pairs,
                              ActionListener sizeListener, ActionListener matrixListener) {
@@ -43,9 +44,11 @@ public class GraphDrawer extends JFrame {
             addTableWithInfrastructure(nodes.size() + 1, nodes, pairs);
         }
 
+        public JScrollPane getScrollPane() { return scrollPane; }
+
         private void addTableWithInfrastructure(int size, List<String> nodes, List<Pair<String, String>> pairs) {
             JPanel container = new JPanel();
-            JScrollPane scrollPane = new JScrollPane();
+            scrollPane = new JScrollPane();
             GroupLayout layout = new GroupLayout(container);
             layout.setAutoCreateGaps(true);
             layout.setAutoCreateContainerGaps(true);
@@ -69,7 +72,7 @@ public class GraphDrawer extends JFrame {
             table.setRowSelectionAllowed(false);
             table.getTableHeader().setEnabled(false);
             table.setFont(new Font("Microsoft JhengHei", Font.BOLD, 26));
-            JList<String> rowHeader = getRowHeader(nodes);
+            JList<String> rowHeader = getRowHeaders(nodes);
             rowHeader.setFixedCellHeight(CELL_SIZE);
             scrollPane.setRowHeaderView(rowHeader);
             layout.setHorizontalGroup(
@@ -87,7 +90,7 @@ public class GraphDrawer extends JFrame {
             add(container);
         }
 
-        private JList<String> getRowHeader(List<String> nodes) {
+        private JList<String> getRowHeaders(List<String> nodes) {
             nodes.add(0, "");
             ListModel<String> listModel = new AbstractListModel<>() {
                 final String[] headers = nodes.toArray(String[]::new);
@@ -96,6 +99,7 @@ public class GraphDrawer extends JFrame {
                     return headers[index];
                 }
             };
+
             return new JList<>(listModel);
         }
 
@@ -306,6 +310,9 @@ public class GraphDrawer extends JFrame {
         graphCreator.setCellSizes();
         graphCreator.setColumnHeaders(names);
         graphCreator.setTableValues(size + 1, names, Collections.emptyList());
+        JList<String> headers = graphCreator.getRowHeaders(names);
+        headers.setFixedCellHeight(60);
+        graphCreator.getScrollPane().setRowHeaderView(headers);
         System.out.println("table is updated");
     }
 
