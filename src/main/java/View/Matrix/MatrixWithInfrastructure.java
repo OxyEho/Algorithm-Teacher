@@ -19,9 +19,10 @@ public class MatrixWithInfrastructure extends JPanel {
     private static final int CELL_SIZE = 60;
     private static final int xShift = 80;
     private static final int yShift = 85;
+    private final JTextField sizeField;
 
     public MatrixWithInfrastructure(int parentWidth, int parentHeight, int tableSize,
-                                    ActionListener sizeListener, ActionListener matrixListener,
+                                    DocumentListener sizeListener, ActionListener matrixListener,
                                     List<String> nodes, List<Pair<String, String>> pairs) {
         scrollPane = new JScrollPane();
         setBounds(xShift, yShift, parentWidth - xShift, parentHeight - yShift);
@@ -37,32 +38,9 @@ public class MatrixWithInfrastructure extends JPanel {
         };
         //cellsValidity = new boolean[tableSize][tableSize];
         //setCellsValidity();
-        JTextField sizeField = new JTextField();
+        sizeField = new JTextField();
         // sizeField.addActionListener(sizeListener);
-        sizeField.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-                warn();
-            }
-            public void removeUpdate(DocumentEvent e) {
-                //warn();
-            }
-            public void insertUpdate(DocumentEvent e) {
-                warn();
-            }
-
-            public void warn() {
-                System.out.println("chngd");
-                try {
-                    if (Integer.parseInt(sizeField.getText())<=0){
-                        JOptionPane.showMessageDialog(null,
-                                "Error: Please enter number bigger than 0", "Error Message",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (NumberFormatException ignore) {
-
-                }
-            }
-        });
+        sizeField.getDocument().addDocumentListener(sizeListener);
         JButton button = new JButton("Показать граф");
         button.addActionListener(matrixListener);
         configureTable(tableSize, nodes, pairs);
@@ -113,6 +91,8 @@ public class MatrixWithInfrastructure extends JPanel {
                 ).addComponent(scrollPane)
         );
     }
+
+    public JTextField getSizeField() { return sizeField; }
 
     public JTable getTable() { return table; }
 

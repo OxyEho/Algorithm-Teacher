@@ -7,6 +7,8 @@ import View.GraphDrawer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -57,20 +59,39 @@ public class DrawerController {
         }
     }
 
-    private class GraphSizeFieldListener implements ActionListener {
+    private class GraphSizeFieldListener implements DocumentListener {
+        private final JTextField field = graphDrawer.getSizeField();
+
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void insertUpdate(DocumentEvent e) {
+            changeTable();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeTable();
+        }
+
+        private void changeTable() {
             try {
-                JTextField field = (JTextField) e.getSource();
-                try {
-                    int size = Integer.parseInt(field.getText());
+                int size = Integer.parseInt(field.getText());
+                if (size > 1) {
                     field.setBackground(Color.WHITE);
                     graphDrawer.setTableSize(size);
-
-                } catch (NumberFormatException numberFormatException){
-                    field.setBackground(Color.RED);
                 }
-            } catch (ClassCastException ignored) { }
+                else JOptionPane.showMessageDialog(
+                        null,
+                        "Error: Please enter number bigger than 1", "Error Message",
+                        JOptionPane.ERROR_MESSAGE);
+
+            } catch (NumberFormatException numberFormatException){
+                field.setBackground(Color.RED);
+            }
         }
     }
 

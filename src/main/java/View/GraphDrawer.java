@@ -7,6 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
@@ -30,7 +31,7 @@ public class GraphDrawer extends JFrame {
         private final MatrixWithInfrastructure matrixPanel;
 
         private GraphCreator(List<String> nodes, List<Pair<String, String>> pairs,
-                             ActionListener sizeListener, ActionListener matrixListener) {
+                             DocumentListener sizeListener, ActionListener matrixListener) {
             super();
             setVisible(true);
             setLayout(null);
@@ -165,7 +166,7 @@ public class GraphDrawer extends JFrame {
     }
 
     public GraphDrawer(ActionListener onExit, ActionListener onStart,
-                       ActionListener sizeListener, ActionListener matrixListener,
+                       DocumentListener sizeListener, ActionListener matrixListener,
                        List<String> nodes, List<Pair<String, String>> pairs) {
 
         startNodeChoice = new JComboBox<>(nodes.toArray(String[]::new));
@@ -267,4 +268,6 @@ public class GraphDrawer extends JFrame {
     public JButton getButton(String name) {
         return buttons.getOrDefault(name, null);
     }
+
+    public JTextField getSizeField() { return graphCreator.matrixPanel.getSizeField(); }
 }
