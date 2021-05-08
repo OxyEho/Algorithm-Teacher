@@ -16,7 +16,7 @@ public class DigitalCellEditor extends DefaultCellEditor {
         return verifier.verify(editorComponent) && super.stopCellEditing();
     }
 
-    private static class DigitVerifier extends InputVerifier{
+    private static class DigitVerifier extends InputVerifier {
         @Override
         public boolean verify(JComponent input) {
             try{

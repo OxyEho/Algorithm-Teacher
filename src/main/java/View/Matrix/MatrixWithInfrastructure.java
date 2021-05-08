@@ -3,6 +3,8 @@ package View.Matrix;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
@@ -13,6 +15,7 @@ import java.util.List;
 public class MatrixWithInfrastructure extends JPanel {
     private final JScrollPane scrollPane;
     private final JTable table;
+    //private final boolean[][] cellsValidity;
     private static final int CELL_SIZE = 60;
     private static final int xShift = 80;
     private static final int yShift = 85;
@@ -32,8 +35,34 @@ public class MatrixWithInfrastructure extends JPanel {
                     return super.getCellEditor(row, column);
             }
         };
+        //cellsValidity = new boolean[tableSize][tableSize];
+        //setCellsValidity();
         JTextField sizeField = new JTextField();
-        sizeField.addActionListener(sizeListener);
+        // sizeField.addActionListener(sizeListener);
+        sizeField.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                warn();
+            }
+            public void removeUpdate(DocumentEvent e) {
+                //warn();
+            }
+            public void insertUpdate(DocumentEvent e) {
+                warn();
+            }
+
+            public void warn() {
+                System.out.println("chngd");
+                try {
+                    if (Integer.parseInt(sizeField.getText())<=0){
+                        JOptionPane.showMessageDialog(null,
+                                "Error: Please enter number bigger than 0", "Error Message",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ignore) {
+
+                }
+            }
+        });
         JButton button = new JButton("Показать граф");
         button.addActionListener(matrixListener);
         configureTable(tableSize, nodes, pairs);
@@ -43,10 +72,19 @@ public class MatrixWithInfrastructure extends JPanel {
         createLayout(new JLabel("Размер: "), sizeField, button);
     }
 
+//    public boolean[][] getCellsValidity() { return cellsValidity; }
+//
+//    private void setCellsValidity() {
+//        for (int i = 0; i < cellsValidity.length; i++) {
+//            for (int j = 0; j < cellsValidity.length; j++) {
+//                cellsValidity[i][j] = true;
+//            }
+//        }
+//    }
+
     private void configureTable(int tableSize, List<String> nodes, List<Pair<String, String>> pairs) {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setSize(new Dimension(CELL_SIZE * tableSize, CELL_SIZE * tableSize));
-
         setCellSizes();
         setColumnHeaders(nodes);
         setTableValues(tableSize, nodes, pairs);
@@ -128,6 +166,4 @@ public class MatrixWithInfrastructure extends JPanel {
             model.setValueAt(1, x + 1, y + 1);
         }
     }
-
-//    private void initTable
 }

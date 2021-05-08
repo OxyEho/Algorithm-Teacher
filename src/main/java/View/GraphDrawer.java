@@ -20,15 +20,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GraphDrawer extends JFrame {
     private static final int DIVIDER = 10;
     private final HashMap<String, JButton> buttons; // Из этого всего можно сделать мапу и объявить её в абстрактном классе
-    private JComboBox<String> startNodeChoice; // (но мне пока не хочется этого делать)
+    private final JComboBox<String> startNodeChoice; // (но мне пока не хочется этого делать)
     private final JComboBox<String> algorithmChoice;
     private List<Circle> circles = new ArrayList<>();
     private final GraphPanel graphPanel;
     private final GraphCreator graphCreator;
 
     private class GraphCreator extends JPanel {
-        private final ActionListener sizeListener, matrixListener;
-        private MatrixWithInfrastructure matrixPanel;
+        private final MatrixWithInfrastructure matrixPanel;
 
         private GraphCreator(List<String> nodes, List<Pair<String, String>> pairs,
                              ActionListener sizeListener, ActionListener matrixListener) {
@@ -38,8 +37,6 @@ public class GraphDrawer extends JFrame {
             setPreferredSize(new Dimension(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight()));
             setDoubleBuffered(true);
             setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.GRAY, Color.GRAY));
-            this.sizeListener = sizeListener;
-            this.matrixListener = matrixListener;
             matrixPanel = new MatrixWithInfrastructure(
                     GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight() / 2,
                     nodes.size() + 1, sizeListener, matrixListener, nodes, pairs
@@ -51,54 +48,7 @@ public class GraphDrawer extends JFrame {
 
         public JScrollPane getScrollPane() { return matrixPanel.getScrollPane(); }
 
-       // public JScrollPane getScrollPane() { return scrollPane; }
-
-//        private void addTableWithInfrastructure(int size, List<String> nodes, List<Pair<String, String>> pairs) {
-//            matrixPanel = new MatrixWithInfrastructure(
-//                    GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight() / 2, size,
-//                    sizeListener, matrixListener, nodes, pairs
-//            );
-//
-//            add(matrixPanel);
-//        }
-
         private JList<String> getRowHeaders(List<String> nodes) { return matrixPanel.getRowHeaders(nodes); }
-//
-//        private void setColumnHeaders(List<String> nodes) {
-//            for (int i = 0; i < table.getColumnCount(); i++) {
-//                if (i == 0)
-//                    table.getColumnModel().getColumn(i).setHeaderValue("");
-//                else
-//                    table.getColumnModel().getColumn(i).setHeaderValue(nodes.get(i-1));
-//            }
-//        }
-//
-//        private void setCellSizes() {
-//            table.setRowHeight(CELL_SIZE);
-//            for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
-//                TableColumn column = table.getColumnModel().getColumn(i);
-//                column.setMaxWidth(CELL_SIZE);
-//            }
-//        }
-//
-//        private void setTableValues(int size, List<String> nodes, List<Pair<String, String>> pairs) {
-//            DefaultTableModel model = (DefaultTableModel) table.getModel();
-//            for (int i = 0; i < size - 1; i++) {
-//                model.setValueAt(nodes.get(i), 0, i+1);
-//                model.setValueAt(nodes.get(i), i+1, 0);
-//            }
-//            for (int i = 1; i < size; i++) {
-//                for (int j = 1; j < size; j++) {
-//                    model.setValueAt(0, i, j);
-//                }
-//            }
-//
-//            for (Pair<String, String> pair: pairs) {
-//                int x = nodes.indexOf(pair.getLeft());
-//                int y = nodes.indexOf(pair.getRight());
-//                model.setValueAt(1, x + 1, y + 1);
-//            }
-//        }
 
         private void rebuildMatrix(int size, List<String> names, List<Pair<String, String>> pairs) {
             matrixPanel.setCellSizes();
@@ -276,9 +226,6 @@ public class GraphDrawer extends JFrame {
             table.removeColumn(c);
         }
         addColumns(size + 1);
-//        graphCreator.setCellSizes();
-//        graphCreator.setColumnHeaders(names);
-//        graphCreator.setTableValues(size + 1, names, Collections.emptyList());
         graphCreator.rebuildMatrix(size + 1, names, Collections.emptyList());
         JList<String> headers = graphCreator.getRowHeaders(names);
         headers.setFixedCellHeight(60);
@@ -315,5 +262,9 @@ public class GraphDrawer extends JFrame {
             buttons.get("Запустить алгоритм").setEnabled(true);
             System.out.println("Stopped!");
         }
+    }
+
+    public JButton getButton(String name) {
+        return buttons.getOrDefault(name, null);
     }
 }

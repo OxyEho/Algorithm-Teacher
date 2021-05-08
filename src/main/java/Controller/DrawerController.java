@@ -57,8 +57,7 @@ public class DrawerController {
         }
     }
 
-    private class GraphSizeFieldListener implements ActionListener  {
-
+    private class GraphSizeFieldListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
@@ -67,6 +66,7 @@ public class DrawerController {
                     int size = Integer.parseInt(field.getText());
                     field.setBackground(Color.WHITE);
                     graphDrawer.setTableSize(size);
+
                 } catch (NumberFormatException numberFormatException){
                     field.setBackground(Color.RED);
                 }
@@ -82,6 +82,9 @@ public class DrawerController {
                 JButton origin = (JButton) e.getSource();
                 if (origin.getText().equals("Показать граф")) {
                     String[][] table = graphDrawer.getTable(); // i - строки
+                    if (!isValidMatrix(table)) {
+                        origin.setEnabled(false);
+                    }
                     graph = new Graph<>(parseGraph(table));
                     graphDrawer.setNodesAndEdges(getNodes(), getEdges());
                 }
@@ -90,7 +93,21 @@ public class DrawerController {
             }
         }
 
-        private HashMap<String, Node<String>> parseGraph(String[][] table){
+        private boolean isValidMatrix(String[][] matrix) {
+            for (int i = 1; i < matrix.length; i++) {
+                for (int j = 1; j < matrix.length; j++) {
+                    try {
+                        Double.parseDouble(matrix[i][j]);
+                    } catch (NumberFormatException ex) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private HashMap<String, Node<String>> parseGraph(String[][] table) throws NumberFormatException {
             HashMap<String, ArrayList<String>> nodesWithAdjacency = new HashMap<>();
             for (int i = 1; i < table.length; i++)
                 if (!nodesWithAdjacency.containsKey(table[0][i]))
@@ -99,7 +116,7 @@ public class DrawerController {
             for (int i = 0; i < table.length; i++){
                 for (int j = 0; j < table.length; j++){
                     if (i == 0 || j == 0) continue;
-                    if (Integer.parseInt(table[i][j]) != 0){
+                    if (Double.parseDouble(table[i][j]) >= 1e-10) { // != 0
                         if (nodesWithAdjacency.containsKey(table[i][0]))
                             nodesWithAdjacency.get(table[i][0]).add(table[0][j]);
                     }
