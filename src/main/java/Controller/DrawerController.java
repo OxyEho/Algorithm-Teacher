@@ -7,13 +7,13 @@ import View.GraphDrawer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -63,11 +63,14 @@ public class DrawerController {
         public void actionPerformed(ActionEvent e) {
             try {
                 JTextField field = (JTextField) e.getSource();
-                int size = Integer.parseInt(field.getText());
-                graphDrawer.setTableSize(size);
-            } catch (NumberFormatException | ClassCastException numberFormatException) {
-                numberFormatException.printStackTrace();
-            }
+                try {
+                    int size = Integer.parseInt(field.getText());
+                    field.setBackground(Color.WHITE);
+                    graphDrawer.setTableSize(size);
+                } catch (NumberFormatException numberFormatException){
+                    field.setBackground(Color.RED);
+                }
+            } catch (ClassCastException ignored) { }
         }
     }
 
