@@ -60,11 +60,11 @@ public class DrawerController {
     }
 
     private class GraphSizeFieldListener implements DocumentListener {
-        private final JTextField field = graphDrawer.getSizeField();
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-            changeTable();
+            JTextField field = graphDrawer.getSizeField();
+            changeTable(field);
         }
 
         @Override
@@ -74,10 +74,11 @@ public class DrawerController {
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            changeTable();
+//            JTextField field = graphDrawer.getSizeField();
+//            changeTable(field);
         }
 
-        private void changeTable() {
+        private void changeTable(JTextField field) {
             try {
                 int size = Integer.parseInt(field.getText());
                 if (size > 1) {
