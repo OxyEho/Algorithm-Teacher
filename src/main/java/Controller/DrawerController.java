@@ -85,13 +85,13 @@ public class DrawerController {
                     field.setBackground(Color.WHITE);
                     graphDrawer.setTableSize(size);
                 }
-                else JOptionPane.showMessageDialog(
-                        null,
-                        "Error: Please enter number bigger than 1", "Error Message",
-                        JOptionPane.ERROR_MESSAGE);
 
             } catch (NumberFormatException numberFormatException){
                 field.setBackground(Color.RED);
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Please, enter the number", "Error Message",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }
