@@ -31,7 +31,7 @@ public class MatrixWithInfrastructure extends JPanel {
                 if (row >= 1 && row < this.getWidth() && column >= 1 && column < this.getHeight())
                     return digitalCellEditor;
                 else
-                    return super.getCellEditor(row, column);
+                    return new VertexCellEditor(row, column, table.getModel());
             }
         };
         sizeField = new JTextField(String.valueOf(nodes.size()));

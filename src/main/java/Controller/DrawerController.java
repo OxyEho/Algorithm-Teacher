@@ -21,11 +21,9 @@ import java.util.stream.Collectors;
 
 public class DrawerController {
     private Graph<String> graph;
-    private final ActionListener toMenuAction;
     private final GraphDrawer graphDrawer;
     public DrawerController(ActionListener toMenu, Graph<String> graph){
         this.graph = graph;
-        toMenuAction = toMenu;
         graphDrawer = new GraphDrawer(toMenu, new RunButtonListener(), new GraphSizeFieldListener(),
                 new ShowGraphButtonListener(), getNodes(), getEdges());
     }
@@ -114,15 +112,6 @@ public class DrawerController {
                 JButton origin = (JButton) e.getSource();
                 if (origin.getText().equals("Показать граф")) {
                     String[][] table = graphDrawer.getTable(); // i - строки
-//                    if (!isValidMatrix(table)) {
-//                        JOptionPane.showMessageDialog(
-//                                null,
-//                                "Пожалуйста, проверьте матрицу на наличие некорректных (красных) клеток " +
-//                                        "и повторите попытку.",
-//                                "Error Message",
-//                                JOptionPane.ERROR_MESSAGE);
-//                        return;
-//                    }
                     if (!isValidSize(graphDrawer.getSizeField().getText())){
                         JOptionPane.showMessageDialog(
                                 null,
@@ -138,20 +127,6 @@ public class DrawerController {
                 numberFormatException.printStackTrace();
             }
         }
-
-//        private boolean isValidMatrix(String[][] matrix) {
-//            try {
-//                for (int i = 1; i < matrix.length; i++) {
-//                    for (int j = 1; j < matrix.length; j++) {
-//                        Double.parseDouble(matrix[i][j]);
-//                    }
-//                }
-//            } catch (NumberFormatException ex) {
-//                return false;
-//            }
-//
-//            return true;
-//        }
 
         private boolean isValidSize(String sizeFieldText) {
             try {
