@@ -81,16 +81,22 @@ public class DrawerController {
         private void changeTable(JTextField field) {
             try {
                 int size = Integer.parseInt(field.getText());
-                if (size > 1) {
+                if (size > 1) { // А почему бы графу не быть с одной вершиной?
                     field.setBackground(Color.WHITE);
                     graphDrawer.setTableSize(size);
+                } else {
+                    field.setBackground(Color.RED);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Размер графа должен быть больше 1", "Error Message",
+                            JOptionPane.ERROR_MESSAGE);
                 }
 
             } catch (NumberFormatException numberFormatException){
                 field.setBackground(Color.RED);
                 JOptionPane.showMessageDialog(
                         null,
-                        "Please, enter the number", "Error Message",
+                        "Пожалуйста, введите натуральное число", "Error Message",
                         JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -105,7 +111,21 @@ public class DrawerController {
                 if (origin.getText().equals("Показать граф")) {
                     String[][] table = graphDrawer.getTable(); // i - строки
                     if (!isValidMatrix(table)) {
-                        origin.setEnabled(false);
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Пожалуйста, проверьте матрицу на наличие некорректных (красных) клеток " +
+                                        "и повторите попытку.",
+                                "Error Message",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (!isValidSize(graphDrawer.getSizeField().getText())){
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Пожалуйста, проверьте, что введенный размер есть натуральное число.",
+                                "Error Message",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
                     graph = new Graph<>(parseGraph(table));
                     graphDrawer.setNodesAndEdges(getNodes(), getEdges());
@@ -116,14 +136,24 @@ public class DrawerController {
         }
 
         private boolean isValidMatrix(String[][] matrix) {
-            for (int i = 1; i < matrix.length; i++) {
-                for (int j = 1; j < matrix.length; j++) {
-                    try {
+            try {
+                for (int i = 1; i < matrix.length; i++) {
+                    for (int j = 1; j < matrix.length; j++) {
                         Double.parseDouble(matrix[i][j]);
-                    } catch (NumberFormatException ex) {
-                        return false;
                     }
                 }
+            } catch (NumberFormatException ex) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private boolean isValidSize(String sizeFieldText) {
+            try {
+                if (Integer.parseInt(sizeFieldText) <= 0) return false;
+            } catch (NumberFormatException ex) {
+                return false;
             }
 
             return true;

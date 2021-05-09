@@ -13,7 +13,7 @@ public class DigitalCellEditor extends DefaultCellEditor {
 
     @Override
     public boolean stopCellEditing() {
-        return verifier.verify(editorComponent) && super.stopCellEditing();
+        return /*verifier.verify(editorComponent) &&*/ super.stopCellEditing();
     }
 
     private static class DigitVerifier extends InputVerifier {

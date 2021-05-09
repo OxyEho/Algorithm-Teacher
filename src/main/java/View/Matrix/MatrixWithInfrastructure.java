@@ -3,7 +3,6 @@ package View.Matrix;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -15,7 +14,6 @@ import java.util.List;
 public class MatrixWithInfrastructure extends JPanel {
     private final JScrollPane scrollPane;
     private final JTable table;
-    //private final boolean[][] cellsValidity;
     private static final int CELL_SIZE = 60;
     private static final int xShift = 80;
     private static final int yShift = 85;
@@ -36,10 +34,7 @@ public class MatrixWithInfrastructure extends JPanel {
                     return super.getCellEditor(row, column);
             }
         };
-        //cellsValidity = new boolean[tableSize][tableSize];
-        //setCellsValidity();
-        sizeField = new JTextField();
-        // sizeField.addActionListener(sizeListener);
+        sizeField = new JTextField(nodes.size());
         sizeField.getDocument().addDocumentListener(sizeListener);
         JButton button = new JButton("Показать граф");
         button.addActionListener(matrixListener);
@@ -49,16 +44,6 @@ public class MatrixWithInfrastructure extends JPanel {
         scrollPane.setRowHeaderView(rowHeader);
         createLayout(new JLabel("Размер: "), sizeField, button);
     }
-
-//    public boolean[][] getCellsValidity() { return cellsValidity; }
-//
-//    private void setCellsValidity() {
-//        for (int i = 0; i < cellsValidity.length; i++) {
-//            for (int j = 0; j < cellsValidity.length; j++) {
-//                cellsValidity[i][j] = true;
-//            }
-//        }
-//    }
 
     private void configureTable(int tableSize, List<String> nodes, List<Pair<String, String>> pairs) {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);

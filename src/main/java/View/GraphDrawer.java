@@ -6,15 +6,14 @@ import View.Matrix.MatrixWithInfrastructure;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -115,15 +114,26 @@ public class GraphDrawer extends JFrame {
             drawEdges(g, edges, getWidth()/DIVIDER, getHeight()/DIVIDER);
         }
 
+        private void illuminateNodes(List<String> paintingSequence) { // А может можно это занести в GraphPanel?
+            for (Circle circle : circles)
+                circle.setColor(Color.WHITE);
+
+            AtomicInteger lastIndex = new AtomicInteger();
+            final Timer timer = new Timer(1500, null);
+            timer.addActionListener(tick -> onTimerTick(timer, paintingSequence, lastIndex));
+            timer.start();
+        }
+
         public void setNodesAndEdges(List<String> nodes, List<Pair<String, String>> edges) {
+            nodes.sort(String::compareTo);
+            nodes.sort(Comparator.comparingInt(String::length));
             this.nodes = nodes;
             this.edges = edges;
             circles = new ArrayList<>();
             coordinates = new HashMap<>();
             startNodeChoice.removeAllItems();
-            for (var node: nodes) {
+            for (String node: this.nodes) {
                 startNodeChoice.addItem(node);
-                System.out.println(node);
             }
             removeAll();
             addNodes();
@@ -220,7 +230,7 @@ public class GraphDrawer extends JFrame {
         JTable table = graphCreator.getTable();
         List<String> names = new ArrayList<>();
         for (int i = 1; i < size + 1; i++)
-            names.add("name" + i);
+            names.add("v" + i);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         for (int i = model.getColumnCount() - 1; i >= 0 ; i--) {
             TableColumn c = table.getColumnModel().getColumn(i);
@@ -231,22 +241,13 @@ public class GraphDrawer extends JFrame {
         JList<String> headers = graphCreator.getRowHeaders(names);
         headers.setFixedCellHeight(60);
         graphCreator.getScrollPane().setRowHeaderView(headers);
-        System.out.println("table is updated");
     }
 
     public void setNodesAndEdges(List<String> nodes, List<Pair<String, String>> edges) {
         graphPanel.setNodesAndEdges(nodes, edges);
     }
 
-    public void illuminateNodes(List<String> paintingSequence) { // А может можно это занести в GraphPanel?
-        for (Circle circle : circles)
-            circle.setColor(Color.WHITE);
-
-        AtomicInteger lastIndex = new AtomicInteger();
-        final Timer timer = new Timer(1500, null);
-        timer.addActionListener(tick -> onTimerTick(timer, paintingSequence, lastIndex));
-        timer.start();
-    }
+    public void illuminateNodes(List<String> paintingSequence) { graphPanel.illuminateNodes(paintingSequence); }
 
     private void onTimerTick(Timer timer, List<String> paintingSequence, AtomicInteger index) {
         if (index.get() < paintingSequence.size()){
