@@ -1,7 +1,6 @@
 package View.Matrix;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class DigitalCellEditor extends DefaultCellEditor {
     private final InputVerifier verifier;
@@ -13,17 +12,29 @@ public class DigitalCellEditor extends DefaultCellEditor {
 
     @Override
     public boolean stopCellEditing() {
-        return /*verifier.verify(editorComponent) &&*/ super.stopCellEditing();
+        if (!verifier.verify(editorComponent)) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "В этой клетке должно быть действительное число (дробная часть через точку)",
+                    "Error Message",
+                    JOptionPane.ERROR_MESSAGE);
+            cancelCellEditing();
+        }
+
+        return super.stopCellEditing();
     }
 
     private static class DigitVerifier extends InputVerifier {
         @Override
         public boolean verify(JComponent input) {
+            JTextField textField = (JTextField) input;
             try{
-                Double.parseDouble(((JTextField) input).getText());
-                input.setBackground(Color.WHITE);
+                try {
+                    textField.setText(String.valueOf(Integer.parseInt(textField.getText())));
+                } catch (NumberFormatException ex) {
+                    textField.setText(String.valueOf(Double.parseDouble(textField.getText())));
+                }
             } catch (NumberFormatException ex) {
-                input.setBackground(Color.RED);
                 return false;
             }
 

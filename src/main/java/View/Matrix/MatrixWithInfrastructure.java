@@ -34,7 +34,7 @@ public class MatrixWithInfrastructure extends JPanel {
                     return super.getCellEditor(row, column);
             }
         };
-        sizeField = new JTextField(nodes.size());
+        sizeField = new JTextField(String.valueOf(nodes.size()));
         sizeField.getDocument().addDocumentListener(sizeListener);
         JButton button = new JButton("Показать граф");
         button.addActionListener(matrixListener);

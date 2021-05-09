@@ -69,14 +69,18 @@ public class DrawerController {
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-
+            JTextField field = graphDrawer.getSizeField();
+            try {
+                Integer.parseInt(field.getText());
+                field.setBackground(Color.WHITE);
+                changeTable(field);
+            } catch (NumberFormatException ex) {
+                field.setBackground(Color.RED);
+            }
         }
 
         @Override
-        public void changedUpdate(DocumentEvent e) {
-//            JTextField field = graphDrawer.getSizeField();
-//            changeTable(field);
-        }
+        public void changedUpdate(DocumentEvent e) { }
 
         private void changeTable(JTextField field) {
             try {
@@ -110,15 +114,15 @@ public class DrawerController {
                 JButton origin = (JButton) e.getSource();
                 if (origin.getText().equals("Показать граф")) {
                     String[][] table = graphDrawer.getTable(); // i - строки
-                    if (!isValidMatrix(table)) {
-                        JOptionPane.showMessageDialog(
-                                null,
-                                "Пожалуйста, проверьте матрицу на наличие некорректных (красных) клеток " +
-                                        "и повторите попытку.",
-                                "Error Message",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
+//                    if (!isValidMatrix(table)) {
+//                        JOptionPane.showMessageDialog(
+//                                null,
+//                                "Пожалуйста, проверьте матрицу на наличие некорректных (красных) клеток " +
+//                                        "и повторите попытку.",
+//                                "Error Message",
+//                                JOptionPane.ERROR_MESSAGE);
+//                        return;
+//                    }
                     if (!isValidSize(graphDrawer.getSizeField().getText())){
                         JOptionPane.showMessageDialog(
                                 null,
@@ -135,19 +139,19 @@ public class DrawerController {
             }
         }
 
-        private boolean isValidMatrix(String[][] matrix) {
-            try {
-                for (int i = 1; i < matrix.length; i++) {
-                    for (int j = 1; j < matrix.length; j++) {
-                        Double.parseDouble(matrix[i][j]);
-                    }
-                }
-            } catch (NumberFormatException ex) {
-                return false;
-            }
-
-            return true;
-        }
+//        private boolean isValidMatrix(String[][] matrix) {
+//            try {
+//                for (int i = 1; i < matrix.length; i++) {
+//                    for (int j = 1; j < matrix.length; j++) {
+//                        Double.parseDouble(matrix[i][j]);
+//                    }
+//                }
+//            } catch (NumberFormatException ex) {
+//                return false;
+//            }
+//
+//            return true;
+//        }
 
         private boolean isValidSize(String sizeFieldText) {
             try {
