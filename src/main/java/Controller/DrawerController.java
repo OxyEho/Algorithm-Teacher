@@ -83,14 +83,14 @@ public class DrawerController {
         private void changeTable(JTextField field) {
             try {
                 int size = Integer.parseInt(field.getText());
-                if (size > 1) { // А почему бы графу не быть с одной вершиной?
+                if (size > 0) {
                     field.setBackground(Color.WHITE);
                     graphDrawer.setTableSize(size);
                 } else {
                     field.setBackground(Color.RED);
                     JOptionPane.showMessageDialog(
                             null,
-                            "Размер графа должен быть больше 1", "Error Message",
+                            "Размер графа должен быть больше 0", "Error Message",
                             JOptionPane.ERROR_MESSAGE);
                 }
 
