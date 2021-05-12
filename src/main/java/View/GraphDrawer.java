@@ -5,20 +5,19 @@ import View.AbstractPanels.AbstractGraphPanel;
 import View.Matrix.MatrixWithInfrastructure;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GraphDrawer extends JFrame {
-    private static final int DIVIDER = 10;
     private final HashMap<String, JButton> buttons; // Из этого всего можно сделать мапу и объявить её в абстрактном классе
     private final JComboBox<String> startNodeChoice; // (но мне пока не хочется этого делать)
     private final JComboBox<String> algorithmChoice;
@@ -58,18 +57,24 @@ public class GraphDrawer extends JFrame {
     }
 
     private class GraphPanel extends AbstractGraphPanel {
+        private static final int DIVIDER = 10;
+        private static final int ARROW_SIZE = 10;
         private final int preferredWidth, preferredHeight;
         private HashMap<String, Pair<Integer, Integer>> coordinates;
         private List<Pair<String, String>> edges;
         private List<String> nodes;
+        private boolean isDirected, isWeighted;
 
-        private GraphPanel(List<String> nodes, List<Pair<String, String>> edges){
+        private GraphPanel(List<String> nodes, List<Pair<String, String>> edges,
+                           boolean isDirected, boolean isWeighted){
             super(new Dimension(GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight()));
             preferredWidth = GraphDrawer.this.getWidth() / 2;
             preferredHeight = GraphDrawer.this.getHeight();
             coordinates = new HashMap<>();
             this.nodes = nodes;
             this.edges = edges;
+            this.isWeighted = isWeighted;
+            this.isDirected = isDirected;
             addNodes();
         }
 
@@ -96,15 +101,46 @@ public class GraphDrawer extends JFrame {
         }
 
         private void drawEdges(Graphics g, List<Pair<String, String>> edges, int width, int height) {
-            for (Pair<String, String> edge : edges){
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setColor(Color.BLACK);
+            g2.setStroke(new BasicStroke(6));
+            if (isDirected) {
+                drawArrowEdges(g2, edges, width, height);
+            } else {
+                drawLineEdges(g2, edges, width, height);
+            }
+        }
+
+        private void drawLineEdges(Graphics2D g2, List<Pair<String, String>> edges, int width, int height) {
+            for (Pair<String, String> edge : edges) {
                 Pair<Integer, Integer> from = coordinates.get(edge.getLeft());
                 Pair<Integer, Integer> to = coordinates.get(edge.getRight());
-                Graphics2D g2 = (Graphics2D)g;
-                g2.setColor(Color.BLACK);
-                g2.setStroke(new BasicStroke(6));
                 g2.drawLine(from.getLeft() + width/2, from.getRight() + height/2,
                         to.getLeft() + width/2, to.getRight() + height/2);
             }
+        }
+
+        private void drawArrowEdges(Graphics2D g2, List<Pair<String, String>> edges, int width, int height) {
+            for (Pair<String, String> edge : edges) {
+                Pair<Integer, Integer> from = coordinates.get(edge.getLeft());
+                Pair<Integer, Integer> to = coordinates.get(edge.getRight());
+                drawArrow(g2, from.getLeft() + width/2, from.getRight() + height/2,
+                        to.getLeft() + width/2, to.getRight() + height/2);
+            }
+        }
+
+        private void drawArrow(Graphics2D g2, int x1, int y1, int x2, int y2) { // не работает
+//            double dx = x2 - x1, dy = y2 - y1;
+//            double angle = Math.atan2(dy, dx);
+//            int len = (int) Math.sqrt(dx*dx + dy*dy);
+//            AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
+//            at.concatenate(AffineTransform.getRotateInstance(angle));
+//            g2.transform(at);
+//
+//            // Draw horizontal arrow starting in (0, 0)
+//            g2.drawLine(x1, y1, len, y2);
+//            g2.fillPolygon(new int[] { len, len - ARROW_SIZE, len - ARROW_SIZE, len },
+//                    new int[] { 0, -ARROW_SIZE, ARROW_SIZE, 0 }, 4);
         }
 
         @Override
@@ -177,7 +213,8 @@ public class GraphDrawer extends JFrame {
 
     public GraphDrawer(ActionListener onExit, ActionListener onStart,
                        DocumentListener sizeListener, ActionListener matrixListener,
-                       List<String> nodes, List<Pair<String, String>> pairs) {
+                       List<String> nodes, List<Pair<String, String>> pairs,
+                       boolean isDirected, boolean isWeighted) {
 
         startNodeChoice = new JComboBox<>(nodes.toArray(String[]::new));
         algorithmChoice = new JComboBox<>(new String[]{"BFS", "DFS"});
@@ -190,7 +227,7 @@ public class GraphDrawer extends JFrame {
         setUndecorated(true);
         setVisible(true);
 
-        graphPanel = new GraphPanel(nodes, pairs);
+        graphPanel = new GraphPanel(nodes, pairs, isDirected, isWeighted);
         graphCreator = new GraphCreator(nodes, pairs, sizeListener, matrixListener);
         add(graphPanel, BorderLayout.WEST);
         add(new ButtonsPanel(onStart, onExit), BorderLayout.NORTH);

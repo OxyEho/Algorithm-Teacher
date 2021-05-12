@@ -12,7 +12,6 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,7 @@ public class DrawerController {
     public DrawerController(ActionListener toMenu, Graph<String> graph){
         this.graph = graph;
         graphDrawer = new GraphDrawer(toMenu, new RunButtonListener(), new GraphSizeFieldListener(),
-                new ShowGraphButtonListener(), getNodes(), getEdges());
+                new ShowGraphButtonListener(), getNodes(), getEdges(), graph.isDirected(), graph.isWeighted());
     }
 
     /**
@@ -144,10 +143,11 @@ public class DrawerController {
                 if (!nodesWithAdjacency.containsKey(table[0][i]))
                     nodesWithAdjacency.put(table[0][i], new HashMap<>());
 
+            double number;
             for (int i = 0; i < table.length; i++){
                 for (int j = 0; j < table.length; j++){
                     if (i == 0 || j == 0) continue;
-                    double number = Double.parseDouble(table[i][j]);
+                    number = Double.parseDouble(table[i][j]);
                     if (number >= 1e-10) { // != 0
                         if (nodesWithAdjacency.containsKey(table[i][0]))
                             nodesWithAdjacency.get(table[i][0]).put(table[0][j], number);
