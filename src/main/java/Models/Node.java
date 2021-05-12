@@ -2,21 +2,25 @@ package Models;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Node<T> {
     private final T value;
-    private final ArrayList<T> adjacency;
+    private final HashMap<T, Double> adjacency;
     private int sequenceNumber;
 
-    public Node(T value, ArrayList<T> adjacencyList) {
+    public Node(T value, HashMap<T, Double> adjacencyList) {
         this.value = value;
         adjacency = adjacencyList;
     }
 
-    public ArrayList<T> getAdjacency(){ return adjacency; }
+    public HashMap<T, Double> getAdjacency(){ return adjacency; }
 
-    public void addAdjacency(Collection<T> neighbours) {
-        adjacency.addAll(neighbours);
+    public void addAdjacency(Map<T, Double> neighbours) {
+        for (T neighbour: neighbours.keySet()) {
+            adjacency.put(neighbour, neighbours.get(neighbour));
+        }
     }
 
     public T getValue() { return value; }

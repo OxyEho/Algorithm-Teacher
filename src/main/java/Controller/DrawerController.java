@@ -120,7 +120,7 @@ public class DrawerController {
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    graph = new Graph<>(parseGraph(table));
+                    graph = new Graph<>(parseGraph(table), false, false);
                     graphDrawer.setNodesAndEdges(getNodes(), getEdges());
                 }
             } catch (NumberFormatException numberFormatException) {
@@ -139,24 +139,25 @@ public class DrawerController {
         }
 
         private HashMap<String, Node<String>> parseGraph(String[][] table) throws NumberFormatException {
-            HashMap<String, ArrayList<String>> nodesWithAdjacency = new HashMap<>();
+            HashMap<String, HashMap<String, Double>> nodesWithAdjacency = new HashMap<>();
             for (int i = 1; i < table.length; i++)
                 if (!nodesWithAdjacency.containsKey(table[0][i]))
-                    nodesWithAdjacency.put(table[0][i], new ArrayList<>());
+                    nodesWithAdjacency.put(table[0][i], new HashMap<>());
 
             for (int i = 0; i < table.length; i++){
                 for (int j = 0; j < table.length; j++){
                     if (i == 0 || j == 0) continue;
-                    if (Double.parseDouble(table[i][j]) >= 1e-10) { // != 0
+                    double number = Double.parseDouble(table[i][j]);
+                    if (number >= 1e-10) { // != 0
                         if (nodesWithAdjacency.containsKey(table[i][0]))
-                            nodesWithAdjacency.get(table[i][0]).add(table[0][j]);
+                            nodesWithAdjacency.get(table[i][0]).put(table[0][j], number);
                     }
                 }
             }
 
             HashMap<String, Node<String>> result = new HashMap<>();
-            for (String key : nodesWithAdjacency.keySet()){
-                result.put(key, new Node<>(key, nodesWithAdjacency.get(key)));
+            for (String nodeName : nodesWithAdjacency.keySet()){
+                result.put(nodeName, new Node<>(nodeName, nodesWithAdjacency.get(nodeName)));
             }
 
             return result;
@@ -172,6 +173,7 @@ public class DrawerController {
     private List<Pair<String, String>> getEdges(){
         return graph
                 .getEdges()
+                .keySet()
                 .stream()
                 .map(pair -> Pair.of(pair.getLeft(), pair.getRight()))
                 .collect(Collectors.toList());

@@ -6,26 +6,41 @@ import java.util.*;
 
 public class Graph<T>{
     private final HashMap<T, Node<T>> baseMap;
-    private ArrayList<Pair<T, T>> edges;
+    private HashMap<Pair<T, T>, Double> edges;
+    private final boolean isDirected;
+    private final boolean isWeighted;
 
-    public Graph(HashMap<T, Node<T>> baseMap){
+    public Graph(HashMap<T, Node<T>> baseMap, boolean isDirected, boolean isWeighted){
         this.baseMap = baseMap;
+        this.isDirected = isDirected;
+        this.isWeighted = isWeighted;
         this.edges = makeEdges();
     }
 
-    public Graph(){ baseMap = new HashMap<>(); }
+    public Graph(boolean isDirected, boolean isWeighted) {
+        baseMap = new HashMap<>();
+        this.isDirected = isDirected;
+        this.isWeighted = isWeighted;
+    }
 
+    public boolean isWeighted() {
+        return isWeighted;
+    }
 
-    public void addNode(Node<T> node, Collection<T> neighbours){
+    public boolean isDirected() {
+        return isDirected;
+    }
+
+    public void addNode(Node<T> node, Map<T, Double> neighbours){
         if (!baseMap.containsKey(node.getValue())) {
-            baseMap.put(node.getValue(), new Node<>(node.getValue(), new ArrayList<>(neighbours)));
+            baseMap.put(node.getValue(), new Node<>(node.getValue(), new HashMap<>(neighbours)));
         }
         else baseMap.get(node.getValue()).addAdjacency(neighbours);
     }
 
     public void addNode(Node<T> node){
         if (!baseMap.containsKey(node.getValue())) {
-            baseMap.put(node.getValue(), new Node<>(node.getValue(), new ArrayList<>()));
+            baseMap.put(node.getValue(), new Node<>(node.getValue(), new HashMap<>()));
         }
     }
 
@@ -37,15 +52,15 @@ public class Graph<T>{
 
     public Collection<Node<T>> getNodeList(){ return baseMap.values(); }
 
-    public ArrayList<Pair<T, T>> getEdges(){
+    public HashMap<Pair<T, T>, Double> getEdges(){
         return edges;
     }
 
-    public ArrayList<Pair<T, T>> makeEdges(){
-        ArrayList<Pair<T, T>> edges = new ArrayList<>();
-        for (var node : getNodeList()){
-            for (var neighbour : node.getAdjacency()){
-                edges.add(Pair.of(node.getValue(), neighbour));
+    public HashMap<Pair<T, T>, Double> makeEdges(){
+        HashMap<Pair<T, T>, Double> edges = new HashMap<>();
+        for (var node : getNodeList()) {
+            for (var neighbour : node.getAdjacency().keySet()) {
+                edges.put(Pair.of(node.getValue(), neighbour), node.getAdjacency().get(node));
             }
         }
         return edges;
