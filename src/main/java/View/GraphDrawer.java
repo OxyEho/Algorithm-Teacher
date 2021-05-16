@@ -13,6 +13,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -130,6 +132,46 @@ public class GraphDrawer extends JFrame {
         }
 
         private void drawArrow(Graphics2D g2, int x1, int y1, int x2, int y2) { // не работает
+            int radius = 0;
+            g2.drawLine(x1, y1, x2, y2);
+            double dx = x2 - x1;
+            double angle = Math.atan((y2 - y1) / dx) + (x1 < x2 ? Math.PI : 0);
+            if (dx == 0.0d) {
+                angle = (y1 > y2 ? Math.PI/2 : -Math.PI/2);
+            }
+
+
+            double arrowAngle = Math.PI / 12.0d;
+            int arrowSize = 80;
+            double arrowX1 = arrowSize * Math.cos(angle - arrowAngle) - radius;
+            double arrowY1 = arrowSize * Math.sin(angle - arrowAngle) - radius;
+            double arrowX2 = arrowSize * Math.cos(angle + arrowAngle) - radius;
+            double arrowY2 = arrowSize * Math.sin(angle + arrowAngle) - radius;
+
+            GeneralPath polygon = new GeneralPath();
+            polygon.moveTo(x2, y2);
+            polygon.lineTo(x2 + arrowX1, y2 + arrowY1);
+            polygon.lineTo(x2 + arrowX2, y2 + arrowY2);
+            polygon.closePath();
+            g2.fill(polygon);
+            g2.drawLine(x1, y1, x2, y2);
+//            g2.drawLine(x1, y1, (int) (x2 + cx), (int) (y2 + cy));
+//            g2.drawLine(x1, y1, (int) (x2 * (angle / 2)), (int)(y2 * (angle/2)));
+//            AffineTransform tx = new AffineTransform();
+//            Polygon arrowHead = new Polygon();
+//            arrowHead.addPoint( 0,5);
+//            arrowHead.addPoint( -5, -5);
+//            arrowHead.addPoint( 5,-5);
+//            tx.setToIdentity();
+//            double angle = Math.atan2(y2-y1, x2-x1);
+//            tx.translate(x2, y2);
+//            tx.rotate((angle-Math.PI/2d));
+//
+//            Graphics2D g = (Graphics2D) g2.create();
+//            g.setTransform(tx);
+//            g.fill(arrowHead);
+//
+//            g.dispose();
 //            double dx = x2 - x1, dy = y2 - y1;
 //            double angle = Math.atan2(dy, dx);
 //            int len = (int) Math.sqrt(dx*dx + dy*dy);
@@ -161,7 +203,7 @@ public class GraphDrawer extends JFrame {
         }
 
         public void setNodesAndEdges(List<String> nodes, List<Pair<String, String>> edges) {
-            nodes.sort(String::compareTo);
+            nodes.sort(String::compareTo); // (x, y) -> x.compateTo(y)
             nodes.sort(Comparator.comparingInt(String::length));
             this.nodes = nodes;
             this.edges = edges;
