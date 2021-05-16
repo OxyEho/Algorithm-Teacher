@@ -1,7 +1,10 @@
 package Models;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Graph<T>{
@@ -9,6 +12,13 @@ public class Graph<T>{
     private HashMap<Pair<T, T>, Double> edges;
     private final boolean isDirected;
     private final boolean isWeighted;
+
+    public Graph() {
+        super();
+        baseMap = null;
+        isDirected = false;
+        isWeighted = false;
+    }
 
     public Graph(HashMap<T, Node<T>> baseMap, boolean isDirected, boolean isWeighted){
         this.baseMap = baseMap;
@@ -58,4 +68,24 @@ public class Graph<T>{
         }
         return edges;
     }
+
+    public static <T> void graphSerialize(Graph<T> graph, String fileName) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(new File(fileName), graph);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Graph graphDeserialize(String fileName) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(new File(fileName), Graph.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
