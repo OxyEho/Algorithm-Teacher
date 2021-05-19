@@ -1,6 +1,7 @@
 package Models;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
@@ -80,6 +81,9 @@ public class Graph<T>{
 
     public static Graph graphDeserialize(String fileName) {
         ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule mod = new SimpleModule("module");
+        mod.addDeserializer(Graph.class, new GraphDeserialize(Graph.class));
+        objectMapper.registerModule(mod);
         try {
             return objectMapper.readValue(new File(fileName), Graph.class);
         } catch (IOException e) {

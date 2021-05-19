@@ -30,7 +30,7 @@ public class GraphDeserialize extends StdDeserializer<Graph<String>> {
         Iterator<JsonNode> nodes = node.get("baseMap").elements();
         HashMap<String, Node<String>> baseMap = new HashMap<>();
         while (nodes.hasNext()) {
-            JsonNode innerNode = nodes.next();;
+            JsonNode innerNode = nodes.next();
             String value = innerNode.get("value").textValue();
             HashMap<String, Double> adjacency = objectMapper.readValue(innerNode.get("adjacency").toString(), HashMap.class);
             baseMap.put(value, new Node<>(value, adjacency));
