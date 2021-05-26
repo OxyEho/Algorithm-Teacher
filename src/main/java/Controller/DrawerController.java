@@ -12,6 +12,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +24,7 @@ public class DrawerController {
     private final GraphDrawer graphDrawer;
     public DrawerController(ActionListener toMenu, Graph<String> graph){
         this.graph = graph;
-        graphDrawer = new GraphDrawer(toMenu, new RunButtonListener(), new GraphSizeFieldListener(),
+        graphDrawer = new GraphDrawer(toMenu, new RunButtonListener(), new SaveGraphAction(), new GraphSizeFieldListener(),
                 new ShowGraphButtonListener(), getNodes(), getEdges(), graph.isDirected(), graph.isWeighted());
     }
 
@@ -161,6 +162,20 @@ public class DrawerController {
             }
 
             return result;
+        }
+    }
+
+    private class SaveGraphAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton saveButton = (JButton) e.getSource();
+            if (saveButton.getText().equals("Сохранить")) {
+                String userDirectory = System.getProperty("user.dir");
+                String dirName = userDirectory + "/templates";
+                File dir = new File(dirName);
+                boolean isCreated = dir.mkdir();
+                Graph.graphSerialize(graph, dirName + "/" + graphDrawer.getGraphName() + ".json");
+            }
         }
     }
 

@@ -23,9 +23,11 @@ public class GraphDrawer extends JFrame {
     private final HashMap<String, JButton> buttons; // Из этого всего можно сделать мапу и объявить её в абстрактном классе
     private final JComboBox<String> startNodeChoice; // (но мне пока не хочется этого делать)
     private final JComboBox<String> algorithmChoice;
+    private final JComboBox<String> graphNames;
     private List<Circle> circles = new ArrayList<>();
     private final GraphPanel graphPanel;
     private final GraphCreator graphCreator;
+    private final ButtonsPanel buttonsPanel;
 
     private class GraphCreator extends JPanel {
         private final MatrixWithInfrastructure matrixPanel;
@@ -220,11 +222,12 @@ public class GraphDrawer extends JFrame {
     }
 
     private class ButtonsPanel extends AbstractButtonsPanel {
-
-        private ButtonsPanel(ActionListener onStartButtonClick, ActionListener onExitButtonClick){
+        private final JTextField graphName = new JTextField("Graph");
+        private ButtonsPanel(ActionListener onStartButtonClick, ActionListener onExitButtonClick,
+                             ActionListener saveAction){
             super(new Dimension(GraphDrawer.this.getWidth(), GraphDrawer.this.getHeight() / 20));
             createAlgorithmsPart(onStartButtonClick);
-            createServicePart(onExitButtonClick);
+            createServicePart(onExitButtonClick, saveAction);
         }
 
         private void createAlgorithmsPart(ActionListener onStartButtonClick) {
@@ -244,22 +247,38 @@ public class GraphDrawer extends JFrame {
             add(startNodeChoice, constraints);
         }
 
-        private void createServicePart(ActionListener onExitButtonClick) {
+        private void createServicePart(ActionListener onExitButtonClick, ActionListener saveAction) {
+            constraints.gridx++;
+            add(new JLabel("Введите имя графа:"), constraints);
+            constraints.gridx++;
+            graphName.setPreferredSize(new Dimension(100, 25));
+            add(graphName, constraints);
+            JButton saveButton = new JButton("Сохранить");
+            buttons.put(saveButton.getText(), saveButton);
+            saveButton.addActionListener(saveAction);
+            constraints.gridx++;
+            add(saveButton, constraints);
+            constraints.gridx++;
+            add(graphNames, constraints);
             JButton toMenu = new JButton("В главное меню");
             toMenu.addActionListener(onExitButtonClick);
             buttons.put(toMenu.getText(), toMenu);
             constraints.gridx++;
             add(toMenu, constraints);
+
         }
+
+        public String getGraphName() {return graphName.getText(); }
     }
 
-    public GraphDrawer(ActionListener onExit, ActionListener onStart,
+    public GraphDrawer(ActionListener onExit, ActionListener onStart, ActionListener saveAction,
                        DocumentListener sizeListener, ActionListener matrixListener,
                        List<String> nodes, List<Pair<String, String>> pairs,
                        boolean isDirected, boolean isWeighted) {
 
         startNodeChoice = new JComboBox<>(nodes.toArray(String[]::new));
         algorithmChoice = new JComboBox<>(new String[]{"BFS", "DFS"});
+        graphNames = new JComboBox<>();
         buttons = new HashMap<>();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -268,12 +287,14 @@ public class GraphDrawer extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setUndecorated(true);
         setVisible(true);
-
+        // Если создавать панели раньше чем делать все сеттеры, то панели не будут отображаться
         graphPanel = new GraphPanel(nodes, pairs, isDirected, isWeighted);
         graphCreator = new GraphCreator(nodes, pairs, sizeListener, matrixListener);
+        buttonsPanel = new ButtonsPanel(onStart, onExit, saveAction);
         add(graphPanel, BorderLayout.WEST);
-        add(new ButtonsPanel(onStart, onExit), BorderLayout.NORTH);
         add(graphCreator, BorderLayout.EAST);
+        add(buttonsPanel, BorderLayout.NORTH);
+
     }
 
     public String getStartNodeChoice() {
@@ -281,6 +302,8 @@ public class GraphDrawer extends JFrame {
     }
 
     public String getAlgorithm() { return (String) algorithmChoice.getSelectedItem(); }
+
+    public String getGraphName() { return buttonsPanel.getGraphName(); }
 
     public String[][] getTable() {
         JTable table = graphCreator.getTable();
