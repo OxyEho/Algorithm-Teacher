@@ -29,6 +29,7 @@ public class DrawerController {
                 new DownloadGraphListener(), new GraphSizeFieldListener(),
                 new ShowGraphButtonListener(), getNodes(), getEdges(),
                 graph.isDirected(), graph.isWeighted());
+        graphDrawer.setWeightAndDirectCheckBoxesValues(graph.isDirected(), graph.isWeighted());
         String userDirectory = System.getProperty("user.dir");
         String dirName = userDirectory + "/templates";
         File dir = new File(dirName);
@@ -128,7 +129,8 @@ public class DrawerController {
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    graph = new Graph<>(parseGraph(table), false, false);
+                    graph = new Graph<>(parseGraph(table),
+                            graphDrawer.isCreatedGraphIsDirected(), graphDrawer.isCreatedGraphIsWeighted());
                     graphDrawer.setNodesAndEdges(getNodes(), getEdges());
                 }
             } catch (NumberFormatException numberFormatException) {
@@ -213,6 +215,8 @@ public class DrawerController {
                 List<String> nodes = getNodes();
                 nodes.sort(String::compareTo); // (x, y) -> x.compateTo(y)
                 nodes.sort(Comparator.comparingInt(String::length));
+                graphDrawer.setWeightAndDirectCheckBoxesValues(graph.isDirected(), graph.isWeighted());
+                graphDrawer.setSizeFieldText(nodes.size());
                 graphDrawer.setNodesAndEdges(nodes, getEdges());
                 graphDrawer.setTable(nodes, getEdges());
             }

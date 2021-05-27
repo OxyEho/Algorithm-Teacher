@@ -13,7 +13,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.util.List;
 import java.util.*;
@@ -44,14 +43,25 @@ public class GraphDrawer extends JFrame {
                     GraphDrawer.this.getWidth() / 2, GraphDrawer.this.getHeight() / 2,
                     nodes.size() + 1, sizeListener, matrixListener, nodes, pairs
             );
+
             add(matrixPanel);
         }
 
-        public JTable getTable() { return matrixPanel.getTable(); }
+        private void setSizeField(int size) { matrixPanel.setSizeField(Integer.toString(size)); }
 
-        public JScrollPane getScrollPane() { return matrixPanel.getScrollPane(); }
+        private JTable getTable() { return matrixPanel.getTable(); }
+
+        private JScrollPane getScrollPane() { return matrixPanel.getScrollPane(); }
 
         private JList<String> getRowHeaders(List<String> nodes) { return matrixPanel.getRowHeaders(nodes); }
+
+        private boolean isWeighted() { return matrixPanel.isWeighted(); }
+
+        private boolean isDirected() { return matrixPanel.isDirected(); }
+
+        private void setDirectCheckBoxValue(boolean who) { matrixPanel.setDirectCheckBoxValue(who); }
+
+        private void setWeightCheckBoxValue(boolean who) { matrixPanel.setWeightCheckBoxValue(who); }
 
         private void rebuildMatrix(int size, List<String> names, List<Pair<String, String>> pairs) {
             matrixPanel.setCellSizes();
@@ -62,12 +72,12 @@ public class GraphDrawer extends JFrame {
 
     private class GraphPanel extends AbstractGraphPanel {
         private static final int DIVIDER = 10;
-        private static final int ARROW_SIZE = 10;
+        private static final int ARROW_SIZE = 43;
         private final int preferredWidth, preferredHeight;
         private HashMap<String, Pair<Integer, Integer>> coordinates;
         private List<Pair<String, String>> edges;
         private List<String> nodes;
-        private boolean isDirected, isWeighted;
+        private final boolean isDirected, isWeighted;
 
         private GraphPanel(List<String> nodes, List<Pair<String, String>> edges,
                            boolean isDirected, boolean isWeighted){
@@ -151,11 +161,10 @@ public class GraphDrawer extends JFrame {
             g2.drawLine(x1, y1, x2, y2);
 
             double arrowAngle = Math.PI / 12.0d;
-            int arrowSize = 43;
-            double arrowX1 = arrowSize * Math.cos(angle - arrowAngle) - radius;
-            double arrowY1 = arrowSize * Math.sin(angle - arrowAngle) - radius;
-            double arrowX2 = arrowSize * Math.cos(angle + arrowAngle) - radius;
-            double arrowY2 = arrowSize * Math.sin(angle + arrowAngle) - radius;
+            double arrowX1 = ARROW_SIZE * Math.cos(angle - arrowAngle) - radius;
+            double arrowY1 = ARROW_SIZE * Math.sin(angle - arrowAngle) - radius;
+            double arrowX2 = ARROW_SIZE * Math.cos(angle + arrowAngle) - radius;
+            double arrowY2 = ARROW_SIZE * Math.sin(angle + arrowAngle) - radius;
 
             GeneralPath polygon = new GeneralPath();
             polygon.moveTo(x2, y2);
@@ -356,6 +365,7 @@ public class GraphDrawer extends JFrame {
         JList<String> headers = graphCreator.getRowHeaders(names);
         headers.setFixedCellHeight(60);
         graphCreator.getScrollPane().setRowHeaderView(headers);
+
     }
 
     public void setNodesAndEdges(List<String> nodes, List<Pair<String, String>> edges) {
@@ -377,13 +387,19 @@ public class GraphDrawer extends JFrame {
         } else {
             timer.stop();
             buttons.get("Запустить алгоритм").setEnabled(true);
-            System.out.println("Stopped!");
         }
     }
 
-    public JButton getButton(String name) {
-        return buttons.getOrDefault(name, null);
-    }
-
     public JTextField getSizeField() { return graphCreator.matrixPanel.getSizeField(); }
+
+    public boolean isCreatedGraphIsWeighted() { return graphCreator.isWeighted(); }
+
+    public boolean isCreatedGraphIsDirected() { return graphCreator.isDirected(); }
+
+    public void setSizeFieldText(int size) { graphCreator.setSizeField(size); }
+
+    public void setWeightAndDirectCheckBoxesValues(boolean isDirected, boolean isWeighted) {
+        graphCreator.setDirectCheckBoxValue(isDirected);
+        graphCreator.setWeightCheckBoxValue(isWeighted);
+    }
 }

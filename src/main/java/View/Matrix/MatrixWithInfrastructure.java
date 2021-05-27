@@ -18,6 +18,8 @@ public class MatrixWithInfrastructure extends JPanel {
     private static final int xShift = 80;
     private static final int yShift = 85;
     private final JTextField sizeField;
+    private final JCheckBox weightCheckBox;
+    private final JCheckBox directCheckBox;
 
     public MatrixWithInfrastructure(int parentWidth, int parentHeight, int tableSize,
                                     DocumentListener sizeListener, ActionListener matrixListener,
@@ -42,8 +44,12 @@ public class MatrixWithInfrastructure extends JPanel {
         JList<String> rowHeader = getRowHeaders(nodes);
         rowHeader.setFixedCellHeight(CELL_SIZE);
         scrollPane.setRowHeaderView(rowHeader);
-        createLayout(new JLabel("Размер: "), sizeField, button);
+        weightCheckBox = new JCheckBox("Взвешенный");
+        directCheckBox = new JCheckBox("Ориентированный");
+        createLayout(new JLabel("Размер: "), sizeField, button, weightCheckBox, directCheckBox);
     }
+
+    public void setSizeField(String size) { sizeField.setText(size); }
 
     private void configureTable(int tableSize, List<String> nodes, List<Pair<String, String>> pairs) {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -57,7 +63,8 @@ public class MatrixWithInfrastructure extends JPanel {
         table.setFont(new Font("Microsoft JhengHei", Font.BOLD, 26));
     }
 
-    private void createLayout(JLabel sizeLabel, JTextField sizeField, JButton button){
+    private void createLayout(JLabel sizeLabel, JTextField sizeField, JButton button,
+                              JCheckBox isWeighted, JCheckBox isDirected){
         GroupLayout layout = new GroupLayout(this);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
@@ -66,6 +73,7 @@ public class MatrixWithInfrastructure extends JPanel {
                 layout.createParallelGroup().addGroup(
                         layout.createSequentialGroup()
                                 .addComponent(sizeLabel).addComponent(sizeField).addComponent(button)
+                                .addComponent(isWeighted).addComponent(isDirected)
                 ).addComponent(scrollPane)
         );
         layout.linkSize(sizeField, sizeLabel);
@@ -73,9 +81,18 @@ public class MatrixWithInfrastructure extends JPanel {
                 layout.createSequentialGroup().addGroup(
                         layout.createParallelGroup()
                                 .addComponent(sizeLabel).addComponent(sizeField).addComponent(button)
+                                .addComponent(isWeighted).addComponent(isDirected)
                 ).addComponent(scrollPane)
         );
     }
+
+    public boolean isWeighted() { return weightCheckBox.isSelected(); }
+
+    public boolean isDirected() { return directCheckBox.isSelected(); }
+
+    public void setDirectCheckBoxValue(boolean who) { directCheckBox.setSelected(who); }
+
+    public void setWeightCheckBoxValue(boolean who) { weightCheckBox.setSelected(who); }
 
     public JTextField getSizeField() { return sizeField; }
 
