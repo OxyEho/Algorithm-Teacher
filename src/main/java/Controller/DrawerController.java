@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +25,15 @@ public class DrawerController {
     private final GraphDrawer graphDrawer;
     public DrawerController(ActionListener toMenu, Graph<String> graph){
         this.graph = graph;
-        graphDrawer = new GraphDrawer(toMenu, new RunButtonListener(), new SaveGraphAction(), new GraphSizeFieldListener(),
-                new ShowGraphButtonListener(), getNodes(), getEdges(), graph.isDirected(), graph.isWeighted());
+        graphDrawer = new GraphDrawer(toMenu, new RunButtonListener(), new SaveGraphAction(),
+                new DownloadGraphListener(), new GraphSizeFieldListener(),
+                new ShowGraphButtonListener(), getNodes(), getEdges(),
+                graph.isDirected(), graph.isWeighted());
+        String userDirectory = System.getProperty("user.dir");
+        String dirName = userDirectory + "/templates";
+        File dir = new File(dirName);
+        if (dir.exists())
+            graphDrawer.fillGraphsNames(getGraphsNames(dir));
     }
 
     /**
@@ -175,8 +183,41 @@ public class DrawerController {
                 File dir = new File(dirName);
                 boolean isCreated = dir.mkdir();
                 Graph.graphSerialize(graph, dirName + "/" + graphDrawer.getGraphName() + ".json");
+                graphDrawer.fillGraphsNames(getGraphsNames(dir));
             }
         }
+    }
+
+    private List<String> getGraphsNames(File dir) {
+        return Arrays.asList(dir.list());
+    }
+
+    private class DownloadGraphListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton saveButton = (JButton) e.getSource();
+            if (saveButton.getText().equals("Загрузить")) {
+                String userDirectory = System.getProperty("user.dir");
+                String dirName = userDirectory + "/templates";
+                File dir = new File(dirName);
+                if (!dir.exists()) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Сохраненных графов нет.",
+                            "Error Message",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                String name = graphDrawer.getGraphForDownload();
+                graph = Graph.graphDeserialize(dirName + "/" + name);
+                List<String> nodes = getNodes();
+                nodes.sort(String::compareTo); // (x, y) -> x.compateTo(y)
+                nodes.sort(Comparator.comparingInt(String::length));
+                graphDrawer.setNodesAndEdges(nodes, getEdges());
+                graphDrawer.setTable(nodes, getEdges());
+            }
+        }
+
     }
 
     public GraphDrawer getGraphDrawer() { return graphDrawer; }

@@ -203,10 +203,10 @@ public class GraphDrawer extends JFrame {
     private class ButtonsPanel extends AbstractButtonsPanel {
         private final JTextField graphName = new JTextField("Graph");
         private ButtonsPanel(ActionListener onStartButtonClick, ActionListener onExitButtonClick,
-                             ActionListener saveAction){
+                             ActionListener saveAction, ActionListener downloadAction) {
             super(new Dimension(GraphDrawer.this.getWidth(), GraphDrawer.this.getHeight() / 20));
             createAlgorithmsPart(onStartButtonClick);
-            createServicePart(onExitButtonClick, saveAction);
+            createServicePart(onExitButtonClick, saveAction, downloadAction);
         }
 
         private void createAlgorithmsPart(ActionListener onStartButtonClick) {
@@ -226,9 +226,19 @@ public class GraphDrawer extends JFrame {
             add(startNodeChoice, constraints);
         }
 
-        private void createServicePart(ActionListener onExitButtonClick, ActionListener saveAction) {
+        private void createServicePart(ActionListener onExitButtonClick,
+                                       ActionListener saveAction,
+                                       ActionListener downloadAction) {
             constraints.gridx++;
-            add(new JLabel("Введите имя графа:"), constraints);
+            add(new JLabel("Выберите имя графа для загрузки:"), constraints);
+            constraints.gridx++;
+            add(graphNames, constraints);
+            constraints.gridx++;
+            JButton downloadButton = new JButton("Загрузить");
+            downloadButton.addActionListener(downloadAction);
+            add(downloadButton, constraints);
+            constraints.gridx++;
+            add(new JLabel("Введите имя графа для сохранения:"), constraints);
             constraints.gridx++;
             graphName.setPreferredSize(new Dimension(100, 25));
             add(graphName, constraints);
@@ -237,8 +247,6 @@ public class GraphDrawer extends JFrame {
             saveButton.addActionListener(saveAction);
             constraints.gridx++;
             add(saveButton, constraints);
-            constraints.gridx++;
-            add(graphNames, constraints);
             JButton toMenu = new JButton("В главное меню");
             toMenu.addActionListener(onExitButtonClick);
             buttons.put(toMenu.getText(), toMenu);
@@ -250,7 +258,8 @@ public class GraphDrawer extends JFrame {
         public String getGraphName() {return graphName.getText(); }
     }
 
-    public GraphDrawer(ActionListener onExit, ActionListener onStart, ActionListener saveAction,
+    public GraphDrawer(ActionListener onExit, ActionListener onStart,
+                       ActionListener saveAction, ActionListener downloadListener,
                        DocumentListener sizeListener, ActionListener matrixListener,
                        List<String> nodes, List<Pair<String, String>> pairs,
                        boolean isDirected, boolean isWeighted) {
@@ -269,7 +278,7 @@ public class GraphDrawer extends JFrame {
         // Если создавать панели раньше чем делать все сеттеры, то панели не будут отображаться
         graphPanel = new GraphPanel(nodes, pairs, isDirected, isWeighted);
         graphCreator = new GraphCreator(nodes, pairs, sizeListener, matrixListener);
-        buttonsPanel = new ButtonsPanel(onStart, onExit, saveAction);
+        buttonsPanel = new ButtonsPanel(onStart, onExit, saveAction, downloadListener);
         add(graphPanel, BorderLayout.WEST);
         add(graphCreator, BorderLayout.EAST);
         add(buttonsPanel, BorderLayout.NORTH);
@@ -283,6 +292,17 @@ public class GraphDrawer extends JFrame {
     public String getAlgorithm() { return (String) algorithmChoice.getSelectedItem(); }
 
     public String getGraphName() { return buttonsPanel.getGraphName(); }
+
+    public void fillGraphsNames(List<String> names) {
+        graphNames.removeAllItems();
+        for (String name: names) {
+            graphNames.addItem(name);
+        }
+    }
+
+    public String getGraphForDownload() {
+        return (String) graphNames.getSelectedItem();
+    }
 
     public String[][] getTable() {
         JTable table = graphCreator.getTable();
@@ -319,6 +339,20 @@ public class GraphDrawer extends JFrame {
         }
         addColumns(size + 1);
         graphCreator.rebuildMatrix(size + 1, names, Collections.emptyList());
+        JList<String> headers = graphCreator.getRowHeaders(names);
+        headers.setFixedCellHeight(60);
+        graphCreator.getScrollPane().setRowHeaderView(headers);
+    }
+
+    public void setTable(List<String> names, List<Pair<String, String>> pairs) {
+        JTable table = graphCreator.getTable();
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        for (int i = model.getColumnCount() - 1; i >= 0 ; i--) {
+            TableColumn c = table.getColumnModel().getColumn(i);
+            table.removeColumn(c);
+        }
+        addColumns(names.size() + 1);
+        graphCreator.rebuildMatrix(names.size() + 1, names, pairs);
         JList<String> headers = graphCreator.getRowHeaders(names);
         headers.setFixedCellHeight(60);
         graphCreator.getScrollPane().setRowHeaderView(headers);
