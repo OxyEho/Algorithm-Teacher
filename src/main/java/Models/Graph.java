@@ -1,53 +1,95 @@
 package Models;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Graph<T>{
     private final HashMap<T, Node<T>> baseMap;
-    private ArrayList<Pair<T, T>> edges;
+    private HashMap<Pair<T, T>, Double> edges;
+    private final boolean isDirected;
+    private final boolean isWeighted;
 
-    public Graph(HashMap<T, Node<T>> baseMap){
-        this.baseMap = baseMap;
-        this.edges = makeEdges();
+    public Graph() {
+        super();
+        baseMap = null;
+        isDirected = false;
+        isWeighted = false;
     }
 
-    public Graph(){ baseMap = new HashMap<>(); }
+    public Graph(HashMap<T, Node<T>> baseMap, boolean isDirected, boolean isWeighted){
+        this.baseMap = baseMap;
+        this.edges = makeEdges();
+        this.isDirected = isDirected;
+        this.isWeighted = isWeighted;
+    }
 
+    public Graph(boolean isDirected, boolean isWeighted) {
+        baseMap = new HashMap<>();
+        this.isDirected = isDirected;
+        this.isWeighted = isWeighted;
+    }
 
-    public void addNode(Node<T> node, Collection<T> neighbours){
+    public boolean isWeighted() { return isWeighted; }
+
+    public boolean isDirected() { return isDirected; }
+
+    public void addNode(Node<T> node, Map<T, Double> neighbours) {
         if (!baseMap.containsKey(node.getValue())) {
-            baseMap.put(node.getValue(), new Node<>(node.getValue(), new ArrayList<>(neighbours)));
+            baseMap.put(node.getValue(), new Node<>(node.getValue(), new HashMap<>(neighbours)));
         }
         else baseMap.get(node.getValue()).addAdjacency(neighbours);
     }
 
-    public void addNode(Node<T> node){
+    public void addNode(Node<T> node) {
         if (!baseMap.containsKey(node.getValue())) {
-            baseMap.put(node.getValue(), new Node<>(node.getValue(), new ArrayList<>()));
+            baseMap.put(node.getValue(), new Node<>(node.getValue(), new HashMap<>()));
         }
     }
 
     public Node<T> getNode(T value){ return baseMap.get(value); }
 
-    public HashMap<T, Node<T>> getBaseMap() {
-        return baseMap;
-    }
+    public HashMap<T, Node<T>> getBaseMap() { return baseMap; }
 
-    public Collection<Node<T>> getNodeList(){ return baseMap.values(); }
+    public Collection<Node<T>> getNodeList() { return baseMap.values(); }
 
-    public ArrayList<Pair<T, T>> getEdges(){
-        return edges;
-    }
+    public HashMap<Pair<T, T>, Double> getEdges() { return edges; }
 
-    public ArrayList<Pair<T, T>> makeEdges(){
-        ArrayList<Pair<T, T>> edges = new ArrayList<>();
-        for (var node : getNodeList()){
-            for (var neighbour : node.getAdjacency()){
-                edges.add(Pair.of(node.getValue(), neighbour));
+    public HashMap<Pair<T, T>, Double> makeEdges() {
+        HashMap<Pair<T, T>, Double> edges = new HashMap<>();
+        for (var node : getNodeList()) {
+            for (var neighbour : node.getAdjacency().keySet()) {
+                // Важно понять, не запутались ли мы в весах
+                edges.put(Pair.of(node.getValue(), neighbour), node.getAdjacency().get(neighbour));
             }
         }
         return edges;
     }
+
+    public static <T> void graphSerialize(Graph<T> graph, String fileName) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(new File(fileName), graph);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Graph graphDeserialize(String fileName) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule mod = new SimpleModule("module");
+        mod.addDeserializer(Graph.class, new GraphDeserialize(Graph.class));
+        objectMapper.registerModule(mod);
+        try {
+            return objectMapper.readValue(new File(fileName), Graph.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }

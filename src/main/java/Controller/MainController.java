@@ -1,14 +1,19 @@
 package Controller;
 
 import Models.Graph;
+import Models.GraphDeserialize;
 import Models.Node;
 import View.MainWindow;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class MainController {
@@ -17,13 +22,13 @@ public class MainController {
     private static ToMenuButtonListener toMenuButtonListener;
     private static final Graph<String> defaultGraph = new Graph<>(new HashMap<>(){
         {
-            put("a", (new Node<>("a", new ArrayList<>(Arrays.asList("b", "e")))));
-            put("b", (new Node<>("b", new ArrayList<>(Arrays.asList("a", "c")))));
-            put("c", (new Node<>("c", new ArrayList<>(Arrays.asList("b", "d")))));
-            put("d", (new Node<>("d", new ArrayList<>(Arrays.asList("c")))));
-            put("e", (new Node<>("e", new ArrayList<>(Arrays.asList("a")))));
+            put("a", (new Node<>("a", new HashMap<>(){{ put("b", 1d); put("e", 1d); }})));
+            put("b", (new Node<>("b", new HashMap<>(){{ put("a", 1d); put("c", 1d); }})));
+            put("c", (new Node<>("c", new HashMap<>(){{ put("b", 1d); put("d", 1d); }})));
+            put("d", (new Node<>("d", new HashMap<>(){{ put("c", 1d); }})));
+            put("e", (new Node<>("e", new HashMap<>(){{ put("a", 1d); }})));
         }
-    }); // K5
+    }, true, false);
 
     public static void main(String[] args) {
         toMenuButtonListener = new ToMenuButtonListener();
