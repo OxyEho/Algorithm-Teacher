@@ -28,7 +28,7 @@ public class MainController {
             put("d", (new Node<>("d", new HashMap<>(){{ put("c", 1d); }})));
             put("e", (new Node<>("e", new HashMap<>(){{ put("a", 1d); }})));
         }
-    }, false, false);
+    }, true, false);
 
     public static void main(String[] args) {
         toMenuButtonListener = new ToMenuButtonListener();
